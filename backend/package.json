@@ -1,0 +1,37 @@
+{
+    "name": "formationsgest-backend",
+    "version": "1.0.0",
+    "description": "Backend pour l'application de gestion de centre de formation",
+    "main": "src/app.js",
+    "type": "module",
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "node --watch src/app.js"
+    },
+    "keywords": [
+        "formation",
+        "gestion",
+        "mongodb",
+        "express"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^5.1.1",
+        "cloudinary": "^1.41.3",
+        "cors": "^2.8.5",
+        "dotenv": "^16.6.1",
+        "express": "^4.22.1",
+        "express-validator": "^7.0.1",
+        "jsonwebtoken": "^9.0.2",
+        "mongodb": "^7.0.0",
+        "mongodb-memory-server": "^11.0.1",
+        "mongoose": "^8.21.0",
+        "morgan": "^1.10.1",
+        "multer": "^2.0.2",
+        "multer-storage-cloudinary": "^4.0.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.11"
+    }
+}
