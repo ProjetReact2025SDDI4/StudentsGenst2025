@@ -40,6 +40,19 @@ const inscriptionSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    typeCandidat: {
+        type: String,
+        enum: ['PARTICULIER', 'ENTREPRISE'],
+        default: 'PARTICULIER'
+    },
+    entreprise: {
+        type: String,
+        trim: true
+    },
+    fonction: {
+        type: String,
+        trim: true
+    },
     statut: {
         type: String,
         enum: ['EN_ATTENTE', 'CONFIRMEE', 'ANNULEE', 'TERMINEE'],
@@ -48,7 +61,11 @@ const inscriptionSchema = new mongoose.Schema({
     notes: {
         type: String,
         trim: true
-    }
+    },
+    documents: [{
+        type: String,
+        trim: true
+    }]
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

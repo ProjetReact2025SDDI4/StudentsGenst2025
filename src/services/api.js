@@ -20,6 +20,8 @@ export const authAPI = {
     updateMe: (data) => api.put('/auth/me', data),
     changePassword: (data) => api.put('/auth/password', data),
     getAllUsers: () => api.get('/auth/users'),
+    forgotPassword: (data) => api.post('/auth/forgot-password', data),
+    resetPassword: (data) => api.post('/auth/reset-password', data),
 };
 
 export const formationAPI = {
@@ -42,7 +44,8 @@ export const userAPI = {
 export const inscriptionAPI = {
     create: (data) => api.post('/inscriptions', data),
     getAll: () => api.get('/inscriptions'),
-    updateStatus: (id, status) => api.put(`/inscriptions/${id}/status`, { statut: status }),
+    getEvolutionStats: (params) => api.get('/inscriptions/stats/evolution', { params }),
+    updateStatus: (id, status) => api.put(`/inscriptions/${id}`, { statut: status }),
 };
 
 export const formateurAPI = {
@@ -55,6 +58,7 @@ export const planningAPI = {
     getAll: () => api.get('/plannings'),
     create: (data) => api.post('/plannings', data),
     getById: (id) => api.get(`/plannings/${id}`),
+    delete: (id) => api.delete(`/plannings/${id}`),
 };
 
 export const entrepriseAPI = {
@@ -67,14 +71,17 @@ export const entrepriseAPI = {
 
 export const candidatureAPI = {
     create: (data) => api.post('/candidatures', data),
-    getAll: () => api.get('/candidatures'),
-    approve: (id) => api.put(`/candidatures/${id}/accept`),
+    getAll: (params) => api.get('/candidatures', { params }),
+    approve: (id, data) => api.put(`/candidatures/${id}/accept`, data),
+    reject: (id, data) => api.put(`/candidatures/${id}/reject`, data),
 };
 
 export const evaluationAPI = {
     submit: (data) => api.post('/evaluations', data),
-    getAll: () => api.get('/evaluations'),
-    getStats: () => api.get('/evaluations/stats'),
+    getAll: (params) => api.get('/evaluations', { params }),
+    getById: (id) => api.get(`/evaluations/${id}`),
+    getStatsByFormateur: (formateurId) => api.get(`/evaluations/formateur/${formateurId}/stats`),
+    getStatsByFormation: (formationId) => api.get(`/evaluations/formation/${formationId}/stats`),
 };
 
 export default api;

@@ -8,9 +8,16 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
-    axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const logout = () => {
+        localStorage.removeItem('token');
+        setToken(null);
+        setUser(null);
+        delete axios.defaults.headers.common['Authorization'];
+    };
 
     useEffect(() => {
+        axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
         const initAuth = async () => {
             if (token) {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -18,7 +25,7 @@ export const AuthProvider = ({ children }) => {
                     const response = await axios.get('/auth/me');
                     setUser(response.data.data);
                 } catch (error) {
-                    console.error('Session expirée ou invalide');
+                    console.error('Session expirée ou invalide', error);
                     logout();
                 }
             }
@@ -36,13 +43,6 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
         axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
         return userData;
-    };
-
-    const logout = () => {
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
-        delete axios.defaults.headers.common['Authorization'];
     };
 
     const refreshUser = async () => {

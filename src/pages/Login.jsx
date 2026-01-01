@@ -8,13 +8,16 @@ import {
     BookOpen,
     ShieldCheck,
     ArrowLeft,
-    Sparkles
+    Sparkles,
+    Eye,
+    EyeOff
 } from 'lucide-react';
 
 const Login = () => {
     const [credentials, setCredentials] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -40,7 +43,7 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col md:flex-row italic">
+        <div className="min-h-screen bg-white dark:bg-secondary-900 flex flex-col md:flex-row italic">
             {/* Brand/Visual Side */}
             <div className="hidden md:flex md:w-1/2 bg-secondary-900 relative overflow-hidden items-center justify-center p-20">
                 {/* Background effects */}
@@ -87,8 +90,7 @@ const Login = () => {
                 </div>
             </div>
 
-            {/* Form Side */}
-            <div className="flex-1 flex flex-col justify-center items-center p-8 md:p-20 relative bg-gray-50/10 italic">
+            <div className="flex-1 flex flex-col justify-center items-center p-8 md:p-20 relative bg-gray-50/40 italic">
                 <Link to="/" className="absolute top-12 left-12 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-secondary-900 transition-colors">
                     <ArrowLeft size={16} /> Retour au Site
                 </Link>
@@ -102,7 +104,7 @@ const Login = () => {
                         <p className="text-gray-400 font-medium italic">Veuillez entrer vos identifiants pour accéder à votre console.</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                    <form onSubmit={handleSubmit} className="space-y-8 bg-white/80 backdrop-blur-xl rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/60 p-8">
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Adresse Email</label>
@@ -120,17 +122,35 @@ const Login = () => {
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center ml-1">
                                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Mot de Passe</label>
-                                    <button type="button" className="text-[9px] font-black text-primary-600 uppercase tracking-widest hover:underline">Oublié ?</button>
+                                    <Link
+                                        to="/forgot-password"
+                                        className="text-[9px] font-black text-primary-600 uppercase tracking-widest hover:underline"
+                                    >
+                                        Oublié ?
+                                    </Link>
                                 </div>
                                 <div className="relative group">
                                     <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" size={20} />
                                     <input
-                                        type="password" name="password" required
-                                        className="w-full bg-white border border-gray-100 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 transition-all outline-none shadow-sm"
+                                        type={showPassword ? 'text' : 'password'}
+                                        name="password"
+                                        required
+                                        className="w-full bg-white border border-gray-100 rounded-2xl py-5 pl-16 pr-14 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 transition-all outline-none shadow-sm"
                                         placeholder="••••••••••••"
                                         value={credentials.password} onChange={handleChange}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(prev => !prev)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-primary-600 transition-colors flex items-center justify-center"
+                                        aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
                                 </div>
+                                <p className="text-[9px] font-medium text-gray-400 ml-1">
+                                    Utilisez vos identifiants reçus par email pour accéder à votre espace sécurisé.
+                                </p>
                             </div>
                         </div>
 

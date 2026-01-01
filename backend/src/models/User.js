@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Le mot de passe est requis'],
         minlength: [6, 'Le mot de passe doit contenir au moins 6 caractères'],
-        select: false // Ne pas inclure le mot de passe dans les requêtes par défaut
+        select: false
     },
     role: {
         type: String,
@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema({
             message: 'Le rôle doit être ADMIN, FORMATEUR ou ASSISTANT'
         },
         default: 'FORMATEUR'
+    },
+    resetPasswordToken: {
+        type: String
+    },
+    resetPasswordExpires: {
+        type: Date
     }
 }, {
     timestamps: true,

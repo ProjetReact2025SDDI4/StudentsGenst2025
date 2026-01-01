@@ -1,50 +1,143 @@
-# React + Vite
+# FormationsGest – Frontend
 
-📚 Documentation Technique & Workflows - FormationsGest
-🏗️ Architecture du Système
-L'application est une solution Full Stack moderne conçue pour la gestion de centres de formation.
+Application frontend pour la plateforme de gestion de centres de formation **FormationsGest**.
+Ce projet fournit l’interface utilisateur complète : site public, formulaires d’inscription et
+dashboards internes pour les différents rôles (Admin, Assistant, Formateur).
 
-Frontend : React (Vite) + Tailwind CSS + Framer Motion (Animations).
-Backend : Node.js (Express) + Mongoose.
-Base de données : MongoDB Atlas (Cloud).
-Stockage externe : Cloudinary (Stockage sécurisé des CV et images).
-👥 Workflows par Type d'Utilisateur
-1. 🛡️ L'Administrateur (ADMIN)
-Son rôle est stratégique. Il gère les ressources humaines et le catalogue.
+---
 
-Workflow Recrutement :
-Consulte la liste des candidatures reçues via le site public.
-Ouvre le CV (lien direct Cloudinary).
-Clique sur "Approuver" : Le système crée alors instantanément un compte 
-User
- et un profil 
-Formateur
-, génère un mot de passe temporaire et transfère le CV.
-Gestion Catalogue : Crée et édite les formations (Titre, objectifs, coût, durée).
-2. 📋 L'Assistant (ASSISTANT)
-Son rôle est opérationnel. Il fait le lien entre les besoins et les ressources.
+## 🚀 Stack technique
 
-Workflow Planification :
-Reçoit une demande d'une entreprise ou accumule assez d'inscrits individuels.
-Utilise l'outil de planification pour créer une session.
-Sécurité : Si le formateur choisi est déjà pris sur ces dates, le système bloque la création pour éviter les doublons.
-Gestion Clients : Enregistre les fiches entreprises partenaires.
-3. 👨‍🏫 Le Formateur (FORMATEUR)
-Son rôle est pédagogique.
+- **Framework** : React + Vite
+- **Routing** : React Router
+- **UI & styles** : Tailwind CSS (mode sombre via classe `dark`)
+- **HTTP client** : Axios
+- **Icônes** : lucide-react
+- **Graphiques** : Recharts
 
-Monitoring : Accède à son Dashboard privé pour voir son emploi du temps à venir.
-Qualité : Consulte les statistiques de ses évaluations (pédagogie, rythme, support) pour s'améliorer.
-4. 👤 Public / Apprenant
-Workflow Inscription : Parcourt le catalogue -> Remplit le formulaire -> Reçoit une confirmation.
-🔐 Sécurité & Intégrité des Données
-Authentification JWT : Chaque communication entre le frontend et le backend est signée numériquement.
-Permissions Granulaires : Un "Assistant" ne peut pas accéder aux fonctions critiques d'un "Admin" (comme supprimer un utilisateur).
-Validation des Données : Express-validator sécurise les entrées pour éviter toute injection ou donnée corrompue.
-📁 Structure du Backend
-Dossier	Rôle
-models/	Définition des schémas de données (Mongoose).
-controllers/	Logique métier (calculs, vérifications de conflits).
-routes/	Points d'entrée de l'API.
-middlewares/	Sécurité, Upload de fichiers, Gestion des rôles.
-config/	Connexion DB et configuration Cloudinary.
-Votre projet est maintenant parfaitement
+Le frontend communique avec l’API REST Node/Express du projet FormationsGest Backend.
+
+---
+
+## ✨ Fonctionnalités principales
+
+- **Site public**
+  - Page d’accueil présentant l’offre de formation
+  - Catalogue des formations avec filtres (ville, catégorie, type)
+  - Page de détail d’une formation (objectifs, programme, durée, tarif, lieu)
+  - Formulaire d’inscription à une formation
+  - Formulaire de candidature formateur (upload de CV via backend)
+
+- **Espace authentifié**
+  - Connexion sécurisée via JWT
+  - Gestion fine des rôles : `ADMIN`, `ASSISTANT`, `FORMATEUR`
+  - Layout privé avec **Navbar**, **Sidebar** et support du **mode sombre**
+
+- **Dashboards**
+  - **Admin** : supervision globale (formations, inscriptions, plannings, utilisateurs)
+  - **Assistant** : gestion opérationnelle (inscriptions, entreprises, sessions de formation)
+  - **Formateur** : planning personnel, statistiques d’évaluations, prochaines sessions
+
+---
+
+## 🧱 Architecture du projet
+
+Organisation principale du code :
+
+- `src/App.jsx` : définition des routes publiques et protégées
+- `src/pages/` : pages de haut niveau (Home, Login, FormationList, FormationDetail, dashboards…)
+- `src/components/` : composants réutilisables (Navbar, Sidebar, Modal, UIComponents…)
+- `src/context/`
+  - `AuthContext` : gestion de l’authentification et du rôle utilisateur
+  - `ConfirmContext` : modales de confirmation globales
+- `src/services/api.js` : client Axios configuré vers l’API backend (`VITE_API_URL`)
+
+Le mode sombre est activé via la classe `dark` appliquée à la racine de l’application
+et géré par un toggle dans la barre de navigation.
+
+---
+
+## ⚙️ Prérequis
+
+- Node.js **>= 18**
+- npm ou yarn
+
+---
+
+## 🛠 Installation & démarrage
+
+Cloner le dépôt puis installer les dépendances :
+
+```bash
+npm install
+```
+
+Lancer le serveur de développement Vite :
+
+```bash
+npm run dev
+```
+
+Par défaut, l’application est disponible sur `http://localhost:5173`.
+
+---
+
+## 🔑 Configuration des variables d’environnement
+
+Le frontend utilise les variables d’environnement Vite (préfixe `VITE_`).
+Créer un fichier `.env` à la racine du projet et définir notamment :
+
+```bash
+VITE_API_URL=https://votre-backend-url.com/api
+```
+
+- `VITE_API_URL` : URL de base de l’API backend.
+  - En développement, vous pouvez utiliser : `http://localhost:5000/api`
+  - En production, renseignez l’URL de votre backend déployé.
+
+Exemple complet de `.env` pour le développement :
+
+```bash
+VITE_API_URL=http://localhost:5000/api
+```
+
+---
+
+## 📜 Scripts NPM
+
+- `npm run dev` : lance le serveur de développement Vite
+- `npm run build` : génère le build de production dans le dossier `dist`
+- `npm run preview` : lance un serveur local pour prévisualiser le build
+- `npm run lint` : exécute ESLint sur le projet
+
+---
+
+## 🔐 Authentification & autorisations
+
+- Authentification par **JWT** : le token est stocké côté client et ajouté automatiquement
+  aux requêtes sortantes via Axios.
+- `AuthContext` récupère l’utilisateur connecté via `/auth/me` et expose :
+  - `user`, `token`, `login`, `logout`, `refreshUser`, `loading`
+  - Helpers de rôle : `isAdmin`, `isAssistant`, `isFormateur`
+- Les routes protégées sont gérées par le composant `PrivateRoute`, qui vérifie le rôle
+  autorisé avant d’afficher la page.
+
+---
+
+## 🚢 Déploiement (exemple Vercel)
+
+1. Pousser le projet sur GitHub (par exemple `formationsgest-frontend`).
+2. Sur Vercel :
+   - Créer un nouveau projet à partir du repo GitHub.
+   - Framework détecté : **Vite**.
+   - Build Command : `npm run build`
+   - Output Directory : `dist`
+3. Dans **Settings → Environment Variables**, définir :
+   - `VITE_API_URL` = URL publique de l’API backend (par ex. `https://formationsgest-backend.onrender.com/api`)
+4. Lancer un déploiement.
+
+---
+
+## 📄 Licence
+
+Projet propriétaire – usage interne pour la plateforme FormationsGest.

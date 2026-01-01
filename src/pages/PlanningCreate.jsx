@@ -35,7 +35,7 @@ const PlanningCreate = () => {
                 setFormateurs(resFact.data.data);
                 setEntreprises(resEnt.data.data);
             } catch (err) {
-                console.error('Erreur chargement données planification');
+                console.error('Erreur chargement données planification', err);
             }
         };
         loadData();
@@ -53,6 +53,7 @@ const PlanningCreate = () => {
             alert('Session planifiée avec succès !');
             navigate('/admin/plannings');
         } catch (err) {
+            console.error('Erreur lors de la planification', err);
             alert(err.response?.data?.message || 'Erreur lors de la planification');
         } finally {
             setLoading(false);

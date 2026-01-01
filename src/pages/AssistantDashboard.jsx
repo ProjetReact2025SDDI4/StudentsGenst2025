@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { planningAPI, inscriptionAPI, entrepriseAPI } from '../services/api';
+import { useConfirm } from '../context/ConfirmContext';
 import {
     LayoutDashboard,
     Calendar,
@@ -17,35 +18,72 @@ import {
 } from 'lucide-react';
 
 const AssistantDashboard = () => {
+    const confirm = useConfirm();
     const [stats, setStats] = useState({
         nextSessions: [],
         pendingInscriptions: [],
-        totalEntreprises: 0
+        totalEntreprises: 0,
+        evolutionInscriptions: []
     });
     const [loading, setLoading] = useState(true);
+    const [selectedPeriod, setSelectedPeriod] = useState(null);
 
     useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const [planRes, insRes, entRes] = await Promise.all([
-                    planningAPI.getAll(),
-                    inscriptionAPI.getAll(),
-                    entrepriseAPI.getAll()
-                ]);
-
-                setStats({
-                    nextSessions: planRes.data.data.slice(0, 5),
-                    pendingInscriptions: insRes.data.data.filter(i => i.statut === 'EN_ATTENTE').slice(0, 5),
-                    totalEntreprises: entRes.data.data.length
-                });
-            } catch (err) {
-                console.error('Erreur chargement dashboard assistant');
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchDashboardData();
     }, []);
+
+    const fetchDashboardData = async () => {
+        setLoading(true);
+        try {
+            const [planRes, insRes, entRes, evolRes] = await Promise.all([
+                planningAPI.getAll(),
+                inscriptionAPI.getAll(),
+                entrepriseAPI.getAll(),
+                inscriptionAPI.getEvolutionStats({ months: 6 })
+            ]);
+
+            const allSessions = planRes.data.data || [];
+            const upcoming = allSessions
+                .filter(p => new Date(p.dateDebut) >= new Date())
+                .sort((a, b) => new Date(a.dateDebut) - new Date(b.dateDebut))
+                .slice(0, 5);
+
+            const evolution = evolRes.data.data || [];
+
+            setStats({
+                nextSessions: upcoming,
+                pendingInscriptions: insRes.data.data.filter(i => i.statut === 'EN_ATTENTE').slice(0, 5),
+                totalEntreprises: entRes.data.data.length,
+                evolutionInscriptions: evolution
+            });
+        } catch (err) {
+            console.error('Erreur chargement dashboard assistant', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleQuickValidate = async (inscription) => {
+        const isConfirmed = await confirm({
+            title: 'Valider cette inscription ?',
+            message: `Confirmer le dossier de ${inscription.nomComplet} pour "${inscription.formationId?.titre}" ?`,
+            type: 'info',
+            confirmText: 'Valider l\'inscription'
+        });
+
+        if (!isConfirmed) return;
+
+        try {
+            await inscriptionAPI.updateStatus(inscription._id, 'CONFIRMEE');
+            await fetchDashboardData();
+        } catch (err) {
+            console.error('Erreur validation rapide inscription', err);
+            alert('Erreur lors de la validation de l\'inscription');
+        }
+    };
+
+    const evolutionData = stats.evolutionInscriptions || [];
+    const maxTotal = evolutionData.reduce((max, p) => Math.max(max, p.total), 0);
 
     if (loading) return (
         <div className="space-y-10 animate-pulse">
@@ -73,10 +111,10 @@ const AssistantDashboard = () => {
                         <Search size={20} />
                     </button>
                     <Link
-                        to="/admin/plannings/create"
+                        to="/admin/plannings"
                         className="bg-secondary-900 text-white px-6 py-3.5 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 active:scale-95"
                     >
-                        <Plus size={18} /> Nouvelle Session
+                        <Calendar size={18} /> Voir le Planning
                     </Link>
                 </div>
             </header>
@@ -103,7 +141,6 @@ const AssistantDashboard = () => {
             </div>
 
             <div className="grid lg:grid-cols-3 gap-10">
-                {/* Main Activities */}
                 <div className="lg:col-span-2 space-y-10">
                     <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
                         <div className="flex justify-between items-center mb-10">
@@ -143,6 +180,127 @@ const AssistantDashboard = () => {
                             )}
                         </div>
                     </div>
+
+                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
+                        <div className="flex justify-between items-center mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="p-3 bg-primary-50 rounded-xl text-primary-600">
+                                    <TrendingUp size={20} />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black text-secondary-900 tracking-tighter italic">Évolution des Inscriptions</h2>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Vue synthétique des derniers mois</p>
+                                </div>
+                            </div>
+                            {selectedPeriod && (
+                                <div className="text-right">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                        Détails {selectedPeriod.month.toString().padStart(2, '0')}/{selectedPeriod.year}
+                                    </p>
+                                    <p className="text-sm font-black text-secondary-900">
+                                        {selectedPeriod.total} inscriptions
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {evolutionData.length === 0 ? (
+                            <div className="py-16 text-center text-gray-300 text-xs font-black uppercase tracking-[0.25em]">
+                                Pas encore de données suffisantes
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                <div className="flex items-end gap-4 h-56">
+                                    {evolutionData.map(period => {
+                                        const isActive = selectedPeriod && selectedPeriod.period === period.period;
+                                        const total = period.total || 0;
+                                        const baseHeight = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+                                        const barHeight = total === 0 ? 0 : 20 + (baseHeight * 0.8);
+
+                                        const enAttenteRatio = total > 0 ? (period.EN_ATTENTE / total) * 100 : 0;
+                                        const confirmeeRatio = total > 0 ? (period.CONFIRMEE / total) * 100 : 0;
+                                        const termineeRatio = total > 0 ? (period.TERMINEE / total) * 100 : 0;
+                                        const annuleeRatio = total > 0 ? (period.ANNULEE / total) * 100 : 0;
+
+                                        return (
+                                            <button
+                                                key={period.period}
+                                                type="button"
+                                                onClick={() => setSelectedPeriod(period)}
+                                                className="flex flex-col items-center gap-3 flex-1 group"
+                                            >
+                                                <div className="w-full flex-1 flex items-end justify-center">
+                                                    <div
+                                                        className={`w-6 sm:w-8 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden flex flex-col justify-end transition-all duration-300 ${isActive ? 'border-primary-300 shadow-lg shadow-primary-100 scale-[1.05]' : 'group-hover:shadow-md group-hover:scale-[1.02]'}`}
+                                                        style={{ height: `${barHeight}%` }}
+                                                    >
+                                                        {total > 0 && (
+                                                            <>
+                                                                <div
+                                                                    className="bg-amber-400"
+                                                                    style={{ height: `${enAttenteRatio}%` }}
+                                                                />
+                                                                <div
+                                                                    className="bg-emerald-500"
+                                                                    style={{ height: `${confirmeeRatio}%` }}
+                                                                />
+                                                                <div
+                                                                    className="bg-secondary-900"
+                                                                    style={{ height: `${termineeRatio}%` }}
+                                                                />
+                                                                <div
+                                                                    className="bg-gray-300"
+                                                                    style={{ height: `${annuleeRatio}%` }}
+                                                                />
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-1 text-center">
+                                                    <p className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-secondary-900' : 'text-gray-400'}`}>
+                                                        {new Date(period.year, period.month - 1, 1).toLocaleString('fr-FR', { month: 'short' })}
+                                                    </p>
+                                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                                        {total} doss.
+                                                    </p>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="flex flex-wrap items-center justify-between gap-4 text-[9px] font-black uppercase tracking-widest text-gray-400">
+                                        <div className="flex items-center gap-3">
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <span className="w-3 h-3 rounded-full bg-amber-400" /> En attente
+                                            </span>
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <span className="w-3 h-3 rounded-full bg-emerald-500" /> Confirmées
+                                            </span>
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <span className="w-3 h-3 rounded-full bg-secondary-900" /> Terminées
+                                            </span>
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <span className="w-3 h-3 rounded-full bg-gray-300" /> Annulées
+                                            </span>
+                                        </div>
+                                        <div className="text-[9px] font-black text-primary-600 uppercase tracking-widest">
+                                            Vue analytique • 6 derniers mois
+                                        </div>
+                                    </div>
+                                    {selectedPeriod && (
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex flex-wrap gap-3">
+                                            <span>En attente: {selectedPeriod.EN_ATTENTE}</span>
+                                            <span>Confirmées: {selectedPeriod.CONFIRMEE}</span>
+                                            <span>Terminées: {selectedPeriod.TERMINEE}</span>
+                                            <span>Annulées: {selectedPeriod.ANNULEE}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Right Sidebar - Flux Inscriptions */}
@@ -168,8 +326,18 @@ const AssistantDashboard = () => {
                                     </div>
                                     <p className="text-[9px] font-black text-primary-500 uppercase tracking-widest line-clamp-1 italic italic mb-4">{ins.formationId?.titre}</p>
                                     <div className="flex gap-2">
-                                        <button className="flex-1 bg-white text-secondary-900 py-2 rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-primary-500 hover:text-white transition-all">Valider</button>
-                                        <button className="p-2 border border-white/10 rounded-lg text-white/40 hover:text-white transition-all"><ArrowRight size={14} /></button>
+                                        <button
+                                            className="flex-1 bg-white text-secondary-900 py-2 rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-primary-500 hover:text-white transition-all"
+                                            onClick={() => handleQuickValidate(ins)}
+                                        >
+                                            Valider
+                                        </button>
+                                        <Link
+                                            to="/admin/inscriptions"
+                                            className="p-2 border border-white/10 rounded-lg text-white/40 hover:text-white transition-all flex items-center justify-center"
+                                        >
+                                            <ArrowRight size={14} />
+                                        </Link>
                                     </div>
                                 </div>
                             ))}

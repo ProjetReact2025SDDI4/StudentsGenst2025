@@ -1,6 +1,8 @@
+import crypto from 'crypto';
 import User from '../models/User.js';
 import Formateur from '../models/Formateur.js';
 import { generateToken } from '../config/jwt.js';
+import { sendEmail } from '../config/email.js';
 
 /**
  * @desc    Inscription d'un nouvel utilisateur
@@ -20,7 +22,6 @@ export const register = async (req, res) => {
             });
         }
 
-        // Créer l'utilisateur
         const user = await User.create({
             nom,
             prenom,
@@ -36,6 +37,25 @@ export const register = async (req, res) => {
                 motsCles: [],
                 remarques: ''
             });
+        }
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const loginUrl = `${frontendUrl}/login`;
+
+        try {
+            await sendEmail({
+                to: user.email,
+                subject: 'Votre accès FormationsGest',
+                text: `Bonjour ${user.prenom} ${user.nom},\n\nUn compte vient d'être créé pour vous sur la plateforme FormationsGest.\n\nVoici vos informations de connexion :\n\nEmail : ${user.email}\nMot de passe : ${password}\n\nConnectez-vous dès maintenant sur : ${loginUrl}\n\nPour des raisons de sécurité, pensez à modifier votre mot de passe après votre première connexion.\n\nCordialement,\nL'équipe FormationsGest`
+            });
+
+            await sendEmail({
+                to: process.env.ADMIN_EMAIL || 'admin@formationsgest.com',
+                subject: 'Nouvel utilisateur créé sur FormationsGest',
+                text: `Un nouvel utilisateur a été créé.\n\nNom : ${user.prenom} ${user.nom}\nEmail : ${user.email}\nRôle : ${user.role}`
+            });
+        } catch (emailError) {
+            console.error('Erreur lors de l\'envoi des emails de création d\'utilisateur:', emailError);
         }
 
         res.status(201).json({
@@ -219,6 +239,107 @@ export const changePassword = async (req, res) => {
     }
 };
 
+export const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email requis.'
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(200).json({
+                success: true,
+                message: 'Si un compte existe avec cet email, un lien a été envoyé.'
+            });
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
+        await user.save({ validateBeforeSave: false });
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Lien de réinitialisation généré pour', user.email, ':', resetUrl);
+        }
+
+        const message = `Vous avez demandé à réinitialiser votre mot de passe.\n\nCliquez sur le lien suivant ou copiez-le dans votre navigateur pour choisir un nouveau mot de passe :\n\n${resetUrl}\n\nCe lien est valable pendant 1 heure. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.`;
+
+        try {
+            await sendEmail({
+                to: user.email,
+                subject: 'Réinitialisation de votre mot de passe',
+                text: message
+            });
+        } catch (emailError) {
+            console.error('Erreur lors de l\'envoi de l\'email de réinitialisation:', emailError);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Si un compte existe avec cet email, un lien a été envoyé.'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la demande de réinitialisation de mot de passe.',
+            error: error.message
+        });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { token, password } = req.body;
+
+        if (!token || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Token et nouveau mot de passe requis.'
+            });
+        }
+
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        const user = await User.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: { $gt: Date.now() }
+        }).select('+password');
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Lien de réinitialisation invalide ou expiré.'
+            });
+        }
+
+        user.password = password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Mot de passe réinitialisé avec succès.'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la réinitialisation du mot de passe.',
+            error: error.message
+        });
+    }
+};
+
 /**
  * @desc    Récupérer tous les utilisateurs
  * @route   GET /api/auth/users
@@ -242,4 +363,4 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
-export default { register, login, getMe, updateProfile, changePassword, getAllUsers };
+export default { register, login, getMe, updateProfile, changePassword, getAllUsers, forgotPassword, resetPassword };

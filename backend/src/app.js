@@ -18,10 +18,13 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000')
+    .split(',')
+    .map(origin => origin.trim());
 
 // Middlewares
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    origin: allowedOrigins,
     credentials: true
 }));
 app.use(express.json());
@@ -67,7 +70,7 @@ app.use((req, res) => {
 });
 
 // Gestion globale des erreurs
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
     console.error('Erreur:', err);
     res.status(err.status || 500).json({
         success: false,

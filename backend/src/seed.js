@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import User from './models/User.js';
 import Formation from './models/Formation.js';
@@ -21,7 +20,7 @@ const seedData = async () => {
         console.log('👤 Création des utilisateurs...');
 
         // Créer l'admin
-        const admin = await User.create({
+        await User.create({
             nom: 'Admin',
             prenom: 'Super',
             email: 'admin@formationsgest.com',
@@ -30,7 +29,7 @@ const seedData = async () => {
         });
 
         // Créer un assistant
-        const assistant = await User.create({
+        await User.create({
             nom: 'Martin',
             prenom: 'Sophie',
             email: 'assistant@formationsgest.com',
@@ -55,9 +54,9 @@ const seedData = async () => {
             role: 'FORMATEUR'
         });
 
-        console.log('👨‍🏫 Création des profils formateurs...');
+        console.log(' Création des profils formateurs...');
 
-        const formateur1 = await Formateur.create({
+        await Formateur.create({
             userId: formateurUser1._id,
             motsCles: ['JavaScript', 'React', 'Node.js', 'Web'],
             specialites: ['Développement Frontend', 'Développement Backend'],
@@ -65,7 +64,7 @@ const seedData = async () => {
             experience: 10
         });
 
-        const formateur2 = await Formateur.create({
+        await Formateur.create({
             userId: formateurUser2._id,
             motsCles: ['Python', 'Data Science', 'Machine Learning', 'IA'],
             specialites: ['Intelligence Artificielle', 'Analyse de données'],
@@ -73,7 +72,7 @@ const seedData = async () => {
             experience: 8
         });
 
-        console.log('📚 Création des formations...');
+        console.log(' Création des formations...');
 
         const formations = await Formation.insertMany([
             {

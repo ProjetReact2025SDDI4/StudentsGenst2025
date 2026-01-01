@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { evaluationAPI } from '../services/api';
 
@@ -16,6 +16,8 @@ const EvaluationForm = () => {
     });
 
     const [commentaire, setCommentaire] = useState('');
+    const [participantEmail, setParticipantEmail] = useState('');
+    const [anonymous, setAnonymous] = useState(false);
 
     const handleScoreChange = (critere, value) => {
         setScores({ ...scores, [critere]: parseInt(value) });
@@ -25,15 +27,23 @@ const EvaluationForm = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await evaluationAPI.submit({
+            const payload = {
                 formationId,
                 formateurId,
                 ...scores,
-                commentaire
-            });
+                commentaire,
+                anonymous
+            };
+
+            if (!anonymous && participantEmail) {
+                payload.participantEmail = participantEmail;
+            }
+
+            await evaluationAPI.submit(payload);
             setSuccess(true);
             setTimeout(() => navigate('/'), 4000);
         } catch (err) {
+            console.error('Erreur lors de l\'envoi de l\'évaluation', err);
             alert('Erreur lors de l\'envoi de l\'évaluation');
         } finally {
             setLoading(false);
@@ -88,6 +98,29 @@ const EvaluationForm = () => {
                                     <StarRating critere="maitriseSujet" label="Expertise Technique" />
                                     <StarRating critere="support" label="Qualité du Support" />
                                     <StarRating critere="rythme" label="Gestion & Logistique" />
+                                </div>
+
+                                <div className="grid sm:grid-cols-2 gap-8 pt-4 border-t border-gray-50">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1 italic">Email (optionnel)</label>
+                                        <input
+                                            type="email"
+                                            disabled={anonymous}
+                                            className="w-full bg-gray-50/50 border border-gray-100 rounded-[2rem] py-4 px-6 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 transition-all outline-none italic placeholder:text-gray-300 disabled:opacity-50"
+                                            placeholder="Pour recevoir un récapitulatif"
+                                            value={participantEmail}
+                                            onChange={(e) => setParticipantEmail(e.target.value)}
+                                        />
+                                    </div>
+                                    <label className="flex items-center gap-3 text-xs font-bold text-gray-500 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox"
+                                            className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                            checked={anonymous}
+                                            onChange={(e) => setAnonymous(e.target.checked)}
+                                        />
+                                        <span>Je souhaite rester anonyme (aucun email ne sera associé).</span>
+                                    </label>
                                 </div>
 
                                 <div className="space-y-4 pt-4 border-t border-gray-50">

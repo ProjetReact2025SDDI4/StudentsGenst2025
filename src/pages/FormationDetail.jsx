@@ -13,7 +13,7 @@ const FormationDetail = () => {
                 const response = await formationAPI.getById(id);
                 setFormation(response.data.data);
             } catch (err) {
-                console.error('Erreur API');
+                console.error('Erreur API', err);
             } finally {
                 setLoading(false);
             }
@@ -37,20 +37,29 @@ const FormationDetail = () => {
     );
 
     return (
-        <div className="bg-white min-h-screen py-10">
+        <div className="bg-white dark:bg-secondary-950 min-h-screen py-10">
             <div className="max-w-6xl mx-auto px-6">
                 {/* Slim Breadcrumb */}
-                <nav className="mb-10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
-                    <Link to="/" className="hover:text-primary-600">Accueil</Link>
+                <nav className="mb-10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                    <Link to="/" className="hover:text-primary-600 dark:hover:text-primary-400">Accueil</Link>
                     <span>/</span>
-                    <Link to="/formations" className="hover:text-primary-600">Catalogue</Link>
+                    <Link to="/formations" className="hover:text-primary-600 dark:hover:text-primary-400">Catalogue</Link>
                     <span>/</span>
-                    <span className="text-secondary-900 truncate max-w-[200px]">{formation.titre}</span>
+                    <span className="text-secondary-900 dark:text-gray-100 truncate max-w-[200px]">{formation.titre}</span>
                 </nav>
 
                 <div className="flex flex-col lg:flex-row gap-16">
                     {/* Main Content */}
                     <div className="flex-[1.5] animate-fade-in">
+                        {formation.image && (
+                            <div className="mb-12 rounded-[3rem] overflow-hidden aspect-[21/9] shadow-2xl">
+                                <img 
+                                    src={formation.image} 
+                                    alt={formation.titre} 
+                                    className="w-full h-full object-cover object-center" 
+                                />
+                            </div>
+                        )}
                         <header className="mb-12">
                             <div className="flex gap-3 mb-6">
                                 <span className="bg-secondary-900 text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest">{formation.categorie}</span>
@@ -58,15 +67,15 @@ const FormationDetail = () => {
                                     {formation.type}
                                 </span>
                             </div>
-                            <h1 className="text-3xl lg:text-5xl font-black text-secondary-900 leading-tight mb-6 capitalize">{formation.titre.toLowerCase()}</h1>
+                            <h1 className="text-3xl lg:text-5xl font-black text-secondary-900 dark:text-gray-50 leading-tight mb-6 capitalize">{formation.titre.toLowerCase()}</h1>
                             <div className="flex gap-10">
                                 <div>
-                                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-tighter mb-1">Durée totale</p>
-                                    <p className="text-lg font-black text-secondary-800 italic">{formation.nombreHeures} heures</p>
+                                    <p className="text-[10px] font-black text-gray-300 dark:text-gray-500 uppercase tracking-tighter mb-1">Durée totale</p>
+                                    <p className="text-lg font-black text-secondary-800 dark:text-gray-100 italic">{formation.nombreHeures} heures</p>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-tighter mb-1">Localisation</p>
-                                    <p className="text-lg font-black text-secondary-800 italic">{formation.ville}</p>
+                                    <p className="text-[10px] font-black text-gray-300 dark:text-gray-500 uppercase tracking-tighter mb-1">Localisation</p>
+                                    <p className="text-lg font-black text-secondary-800 dark:text-gray-100 italic">{formation.ville}</p>
                                 </div>
                             </div>
                         </header>
@@ -74,15 +83,15 @@ const FormationDetail = () => {
                         <div className="space-y-12">
                             <section>
                                 <h2 className="text-xs font-black text-primary-600 uppercase tracking-[0.2em] mb-4">Objectifs du programme</h2>
-                                <p className="text-gray-600 leading-relaxed font-medium lg:text-lg italic">
+                                <p className="text-gray-600 dark:text-gray-200 leading-relaxed font-medium lg:text-lg italic">
                                     {formation.objectifs}
                                 </p>
                             </section>
 
                             <section>
                                 <h2 className="text-xs font-black text-primary-600 uppercase tracking-[0.2em] mb-4">Structure d'enseignement</h2>
-                                <div className="bg-gray-50/50 rounded-3xl p-8 lg:p-12 border border-gray-100 italic">
-                                    <div className="text-gray-700 whitespace-pre-line leading-[1.8] font-medium selection:bg-primary-100">
+                                <div className="bg-gray-50/50 dark:bg-secondary-900 rounded-3xl p-8 lg:p-12 border border-gray-100 dark:border-secondary-800 italic">
+                                    <div className="text-gray-700 dark:text-gray-100 whitespace-pre-line leading-[1.8] font-medium selection:bg-primary-100">
                                         {formation.programme}
                                     </div>
                                 </div>
@@ -95,16 +104,17 @@ const FormationDetail = () => {
                         <div className="card p-8 border-none bg-gray-900 text-white shadow-2xl sticky top-28">
                             <div className="mb-8">
                                 <p className="text-[10px] font-black text-primary-400 uppercase tracking-widest mb-2">Investissement</p>
-                                <p className="text-5xl font-black tracking-tighter">{formation.cout}€</p>
+                                <p className="text-5xl font-black tracking-tighter">{formation.cout} DH</p>
                                 <p className="text-[10px] opacity-40 font-bold mt-1 uppercase">Exonéré de TVA (Formation Pro)</p>
                             </div>
 
                             <div className="space-y-3">
-                                {formation.type === 'INDIVIDU' ? (
-                                    <Link to={`/inscription/${formation._id}`} className="btn-primary w-full py-4 text-center text-sm uppercase tracking-widest shadow-lg shadow-primary-500/20">S'inscrire</Link>
-                                ) : (
-                                    <button className="w-full py-4 rounded-xl border-2 border-white/20 hover:bg-white hover:text-secondary-900 transition-all text-sm font-black uppercase tracking-widest italic">Devis Entreprise</button>
-                                )}
+                                <Link 
+                                    to={`/inscription/${formation._id}`} 
+                                    className="btn-primary w-full py-4 text-center text-sm uppercase tracking-widest shadow-lg shadow-primary-500/20"
+                                >
+                                    {formation.type === 'INDIVIDU' ? 'S\'inscrire' : 'S\'inscrire (Entreprise)'}
+                                </Link>
                                 <button className="w-full text-white/40 hover:text-white text-[10px] font-black uppercase tracking-widest py-4 transition-colors">Télécharger le Syllabus PDF</button>
                             </div>
 

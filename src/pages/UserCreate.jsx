@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { userAPI } from '../services/api';
 
 const UserCreate = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         nom: '',
         prenom: '',
@@ -19,13 +20,34 @@ const UserCreate = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+
+        if (!formData.prenom || !formData.nom || !formData.email || !formData.password) {
+            setError('Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            setError('Le mot de passe doit contenir au moins 6 caractères.');
+            return;
+        }
+
         setLoading(true);
         try {
-            await axios.post('/auth/register', formData);
-            alert('Utilisateur créé avec succès !');
+            const res = await userAPI.getAll();
+            const exists = res.data.data.some(
+                (u) => u.email && u.email.toLowerCase() === formData.email.toLowerCase()
+            );
+
+            if (exists) {
+                setError('Un utilisateur avec cet email existe déjà.');
+                return;
+            }
+
+            await userAPI.create(formData);
             navigate('/admin/users');
         } catch (err) {
-            alert(err.response?.data?.message || 'Erreur lors de la création');
+            setError(err.response?.data?.message || 'Erreur lors de la création');
         } finally {
             setLoading(false);
         }
@@ -47,6 +69,11 @@ const UserCreate = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-10 space-y-8 italic">
+                    {error && (
+                        <div className="mb-4 rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-xs font-medium text-red-700">
+                            {error}
+                        </div>
+                    )}
                     <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Prénom</label>

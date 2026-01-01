@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { userAPI } from '../services/api';
+import { useConfirm } from '../context/ConfirmContext';
 import {
     Users,
     Search,
@@ -12,7 +13,8 @@ import {
     Mail,
     Lock,
     X,
-    Check
+    Check,
+    Download
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import { InputField, Button } from '../components/UIComponents';
@@ -22,6 +24,7 @@ import { InputField, Button } from '../components/UIComponents';
  * Utilise des modals pour la création et l'édition pour une UX fluide
  */
 const UserList = () => {
+    const confirm = useConfirm();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -91,15 +94,15 @@ const UserList = () => {
         try {
             if (modalMode === 'create') {
                 await userAPI.create(formData);
-                // Alert de succès (pourrait être remplacé par un toast)
                 console.log('Utilisateur créé');
-            } else {
-                // await userAPI.update(selectedUser._id, formData);
-                console.log('Update non implémenté dans api.js encore');
+            } else if (selectedUser) {
+                await userAPI.update(selectedUser._id, formData);
+                console.log('Utilisateur mis à jour');
             }
             setIsModalOpen(false);
             fetchUsers();
         } catch (err) {
+            console.error('Erreur lors de l\'opération utilisateur', err);
             alert(err.response?.data?.message || 'Erreur lors de l\'opération');
         } finally {
             setFormLoading(false);
@@ -107,11 +110,19 @@ const UserList = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) {
+        const isConfirmed = await confirm({
+            title: 'Révoquer l\'accès ?',
+            message: 'Cet utilisateur ne pourra plus se connecter à la plateforme. Ses données resteront archivées.',
+            type: 'danger',
+            confirmText: 'Révoquer l\'utilisateur'
+        });
+
+        if (isConfirmed) {
             try {
                 await userAPI.delete(id);
                 fetchUsers();
             } catch (err) {
+                console.error('Erreur lors de la suppression', err);
                 alert('Erreur lors de la suppression');
             }
         }
@@ -129,6 +140,43 @@ const UserList = () => {
     const filteredUsers = users.filter(u =>
         `${u.prenom} ${u.nom} ${u.email}`.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const exportToCsv = (rows, filename) => {
+        if (!rows || rows.length === 0) return;
+        const headers = Object.keys(rows[0]);
+        const escapeValue = (value) => {
+            if (value === null || value === undefined) return '""';
+            const str = String(value).replace(/"/g, '""');
+            return `"${str}"`;
+        };
+        const lines = [];
+        lines.push(headers.map(escapeValue).join(';'));
+        rows.forEach(row => {
+            const line = headers.map(h => escapeValue(row[h])).join(';');
+            lines.push(line);
+        });
+        const csvContent = lines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const handleExport = () => {
+        if (filteredUsers.length === 0) return;
+        const rows = filteredUsers.map(u => ({
+            Prenom: u.prenom,
+            Nom: u.nom,
+            Email: u.email,
+            Role: u.role
+        }));
+        exportToCsv(rows, 'utilisateurs.csv');
+    };
 
     return (
         <div className="space-y-10 italic">
@@ -149,6 +197,15 @@ const UserList = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleExport}
+                        icon={Download}
+                        className="whitespace-nowrap"
+                    >
+                        Exporter
+                    </Button>
                     <Button onClick={() => handleOpenModal('create')} variant="primary" icon={UserPlus}>
                         Inviter
                     </Button>

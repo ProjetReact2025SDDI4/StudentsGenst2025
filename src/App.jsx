@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
@@ -10,12 +10,15 @@ import FormationList from './pages/FormationList';
 import FormationDetail from './pages/FormationDetail';
 import InscriptionForm from './pages/InscriptionForm';
 import CandidatureForm from './pages/CandidatureForm';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Admin / Assistant Pages
 import AdminDashboard from './pages/AdminDashboard';
 import InscriptionList from './pages/InscriptionList';
 import CandidatureList from './pages/CandidatureList';
 import FormationCreate from './pages/FormationCreate';
+import FormationEdit from './pages/FormationEdit';
 import EntrepriseList from './pages/EntrepriseList';
 import PlanningList from './pages/PlanningList';
 import EvaluationForm from './pages/EvaluationForm';
@@ -33,13 +36,39 @@ import ChangePassword from './pages/ChangePassword';
 import MainLayout from './components/MainLayout';
 
 const App = () => {
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'light';
+    const stored = window.localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    window.localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(current => (current === 'dark' ? 'light' : 'dark'));
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-secondary-950 dark:text-gray-50">
       <Routes>
         {/* Public Routes with Navbar */}
-        <Route element={<><Navbar /><div className="flex-grow"><Outlet /></div><footer className="bg-secondary-900 text-white py-12"><div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"><p className="text-secondary-400 font-medium">© 2025 FormationsGest - Gestion Professionnelle de Formation</p></div></footer></>}>
+        <Route element={<><Navbar theme={theme} onToggleTheme={toggleTheme} /><div className="flex-grow"><Outlet /></div><footer className="bg-secondary-900 text-white py-12"><div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"><p className="text-secondary-400 font-medium">© 2025 FormationsGest - Gestion Professionnelle de Formation</p></div></footer></>}>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/formations" element={<FormationList />} />
           <Route path="/formations/:id" element={<FormationDetail />} />
           <Route path="/inscription/:id" element={<InscriptionForm />} />
@@ -48,7 +77,7 @@ const App = () => {
         </Route>
 
         {/* Protected Routes with Sidebar Layout */}
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/" element={<MainLayout theme={theme} onToggleTheme={toggleTheme} />}>
           {/* Dashboard Hub */}
           <Route
             path="admin/dashboard"
@@ -93,10 +122,26 @@ const App = () => {
             }
           />
           <Route
+            path="admin/formations"
+            element={
+              <PrivateRoute roles={['ADMIN', 'ASSISTANT']}>
+                <FormationList />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="admin/formations/create"
             element={
-              <PrivateRoute roles={['ADMIN']}>
+              <PrivateRoute roles={['ADMIN', 'ASSISTANT']}>
                 <FormationCreate />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="admin/formations/edit/:id"
+            element={
+              <PrivateRoute roles={['ADMIN', 'ASSISTANT']}>
+                <FormationEdit />
               </PrivateRoute>
             }
           />

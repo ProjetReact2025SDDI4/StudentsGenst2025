@@ -17,6 +17,7 @@ const CandidatureForm = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [cvFile, setCvFile] = useState(null);
+    const [documents, setDocuments] = useState([]);
     const [formData, setFormData] = useState({
         nom: '',
         prenom: '',
@@ -35,6 +36,11 @@ const CandidatureForm = () => {
         setCvFile(e.target.files[0]);
     };
 
+    const handleDocumentsChange = (e) => {
+        const files = Array.from(e.target.files || []);
+        setDocuments(files);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -42,6 +48,7 @@ const CandidatureForm = () => {
             const data = new FormData();
             Object.keys(formData).forEach(key => data.append(key, formData[key]));
             if (cvFile) data.append('cv', cvFile);
+            documents.forEach(file => data.append('documents', file));
 
             await candidatureAPI.create(data);
             alert('Candidature envoyée avec succès ! Notre équipe reviendra vers vous.');
@@ -54,10 +61,8 @@ const CandidatureForm = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white italic">
-            {/* Header */}
-            <div className="relative pt-32 pb-20 overflow-hidden bg-gray-50/50">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full blur-3xl opacity-50 -mr-48 -mt-48"></div>
+        <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white italic">
+            <div className="relative pt-28 pb-16">
                 <div className="max-w-4xl mx-auto px-4 text-center space-y-8 relative z-10">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest italic shadow-xl">
                         <Sparkles size={14} className="text-primary-500" /> Rejoignez le Réseau d'Experts
@@ -71,11 +76,12 @@ const CandidatureForm = () => {
                 </div>
             </div>
 
-            {/* Form Section */}
             <div className="max-w-4xl mx-auto px-4 py-20">
-                <form onSubmit={handleSubmit} className="bg-white rounded-[3rem] p-10 md:p-16 border border-gray-100 shadow-2xl space-y-12 italic">
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-white/80 backdrop-blur-xl rounded-[3rem] p-10 md:p-16 border border-gray-100 shadow-xl space-y-12 italic"
+                >
                     <div className="space-y-10">
-                        {/* Section 1: Informations Personnelles */}
                         <div className="space-y-8">
                             <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
                                 <User className="text-primary-500" size={24} /> 01. Informations Personnelles
@@ -163,33 +169,66 @@ const CandidatureForm = () => {
                         </div>
 
                         {/* Section 3: Documents */}
-                        <div className="space-y-8">
-                            <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
-                                <Upload className="text-primary-500" size={24} /> 03. Curriculum Vitae
-                            </h2>
-                            <div className="relative group">
-                                <input
-                                    type="file" accept=".pdf,.doc,.docx" required
-                                    onChange={handleFileChange}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                                />
-                                <div className={`w-full border-4 border-dashed rounded-[2rem] p-12 text-center transition-all duration-300
-                                    ${cvFile ? 'border-emerald-100 bg-emerald-50 text-emerald-600' : 'border-gray-50 bg-gray-50 group-hover:bg-primary-50 group-hover:border-primary-100 text-gray-400'}`}>
-                                    {cvFile ? (
-                                        <div className="space-y-2">
-                                            <CheckCircle2 size={48} className="mx-auto" />
-                                            <p className="text-sm font-black uppercase tracking-widest">{cvFile.name}</p>
-                                            <p className="text-[10px] font-medium italic">Fichier prêt pour l'envoi</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-4">
-                                            <Upload size={48} className="mx-auto opacity-20" />
-                                            <div className="space-y-1">
-                                                <p className="text-sm font-black uppercase tracking-widest text-secondary-900">Cliquez ou glissez votre CV</p>
-                                                <p className="text-xs font-medium italic italic">Formats acceptés : PDF, Word (Max 5Mo)</p>
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div className="space-y-8">
+                                <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
+                                    <Upload className="text-primary-500" size={24} /> 03. Curriculum Vitae
+                                </h2>
+                                <div className="relative group">
+                                    <input
+                                        type="file" accept=".pdf,.doc,.docx" required
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                    />
+                                    <div className={`w-full border-4 border-dashed rounded-[2rem] p-12 text-center transition-all duration-300
+                                        ${cvFile ? 'border-emerald-100 bg-emerald-50 text-emerald-600' : 'border-gray-50 bg-gray-50 group-hover:bg-primary-50 group-hover:border-primary-100 text-gray-400'}`}>
+                                        {cvFile ? (
+                                            <div className="space-y-2">
+                                                <CheckCircle2 size={48} className="mx-auto" />
+                                                <p className="text-sm font-black uppercase tracking-widest">{cvFile.name}</p>
+                                                <p className="text-[10px] font-medium italic">Fichier prêt pour l'envoi</p>
                                             </div>
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <div className="space-y-4">
+                                                <Upload size={48} className="mx-auto opacity-20" />
+                                                <div className="space-y-1">
+                                                    <p className="text-sm font-black uppercase tracking-widest text-secondary-900">Cliquez ou glissez votre CV</p>
+                                                    <p className="text-xs font-medium italic italic">Formats acceptés : PDF, Word (Max 5Mo)</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-8">
+                                <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
+                                    <FileText className="text-primary-500" size={24} /> 04. Autres Documents
+                                </h2>
+                                <div className="relative group">
+                                    <input
+                                        type="file" multiple accept=".pdf,.doc,.docx,.jpg,.png"
+                                        onChange={handleDocumentsChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                    />
+                                    <div className={`w-full border-4 border-dashed rounded-[2rem] p-12 text-center transition-all duration-300
+                                        ${documents.length > 0 ? 'border-emerald-100 bg-emerald-50 text-emerald-600' : 'border-gray-50 bg-gray-50 group-hover:bg-primary-50 group-hover:border-primary-100 text-gray-400'}`}>
+                                        {documents.length > 0 ? (
+                                            <div className="space-y-2">
+                                                <CheckCircle2 size={48} className="mx-auto" />
+                                                <p className="text-sm font-black uppercase tracking-widest">{documents.length} fichier(s) sélectionné(s)</p>
+                                                <p className="text-[10px] font-medium italic">Certificats, Lettre de motivation, etc.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                <Upload size={48} className="mx-auto opacity-20" />
+                                                <div className="space-y-1">
+                                                    <p className="text-sm font-black uppercase tracking-widest text-secondary-900">Ajouter des pièces jointes</p>
+                                                    <p className="text-xs font-medium italic italic">Certificats, Attestations, etc. (Max 5 fichiers)</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

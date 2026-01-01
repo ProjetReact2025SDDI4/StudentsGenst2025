@@ -33,6 +33,29 @@ export const TextAreaField = ({ label, icon: Icon, ...props }) => (
 );
 
 /**
+ * Composant de sélection réutilisable
+ */
+export const SelectField = ({ label, icon: Icon, options, ...props }) => (
+    <div className="space-y-2 group">
+        {label && <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">{label}</label>}
+        <div className="relative">
+            {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" size={18} />}
+            <select
+                {...props}
+                className={`w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 ${Icon ? 'pl-12' : 'px-6'} pr-10 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none appearance-none`}
+            >
+                {options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+        </div>
+    </div>
+);
+
+/**
  * Composant de bouton premium
  */
 export const Button = ({ children, variant = 'primary', loading, icon: Icon, ...props }) => {

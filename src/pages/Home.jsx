@@ -14,10 +14,6 @@ import {
     Globe,
 } from 'lucide-react';
 
-/**
- * Page d'accueil publique - Version ultra-premium
- * Design épuré, typographie forte et animations fluides
- */
 const Home = () => {
     const [formations, setFormations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +25,7 @@ const Home = () => {
                 // On prend les 4 dernières formations
                 setFormations(response.data.data.slice(0, 4));
             } catch (err) {
-                console.error('Erreur chargement formations');
+                console.error('Erreur chargement formations', err);
             } finally {
                 setLoading(false);
             }
@@ -38,10 +34,9 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="bg-white min-h-screen italic">
-            {/* Hero Section */}
+        <div className="bg-gradient-to-b from-white via-gray-50 to-white dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 min-h-screen italic">
             <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full -z-10">
+                <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none">
                     <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-primary-100/40 rounded-full blur-[120px] animate-pulse"></div>
                     <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-blue-50/30 rounded-full blur-[120px]"></div>
                 </div>
@@ -75,8 +70,8 @@ const Home = () => {
 
                         <div className="flex-1 w-full max-w-xl animate-fade-in delay-200">
                             <div className="relative group">
-                                <div className="absolute -inset-8 bg-primary-600/5 rounded-[4rem] blur-[80px]"></div>
-                                <div className="relative aspect-[4/5] bg-gray-50 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white">
+                                <div className="absolute -inset-8 bg-primary-600/5 rounded-[4rem] blur-[80px] dark:bg-primary-900/10"></div>
+                                <div className="relative aspect-[4/5] bg-gray-50 dark:bg-secondary-900 rounded-[3rem] overflow-hidden shadow-2xl border border-gray-100 dark:border-secondary-800">
                                     <img
                                         src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
                                         alt="Professional Training"
@@ -90,7 +85,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Featured Grid */}
             <section className="py-32 italic">
                 <div className="max-w-7xl mx-auto px-6 lg:px-12">
                     <div className="flex justify-between items-end mb-16">
@@ -105,21 +99,29 @@ const Home = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {loading ? (
-                            [1, 2, 3, 4].map(i => <div key={i} className="h-80 bg-gray-50 rounded-[2.5rem] animate-pulse"></div>)
+                            [1, 2, 3, 4].map(i => <div key={i} className="h-80 bg-gray-50 dark:bg-secondary-900 rounded-[2.5rem] animate-pulse"></div>)
                         ) : (
                             formations.map((f, idx) => (
-                                <Link key={f._id} to={`/formations/${f._id}`} className="group bg-white rounded-[2.5rem] border border-gray-100 hover:shadow-2xl transition-all p-4 animate-slide-up" style={{ animationDelay: `${idx * 100}ms` }}>
-                                    <div className="aspect-square bg-gray-100 rounded-[2rem] relative overflow-hidden mb-6">
-                                        <div className="absolute inset-0 bg-primary-600/5 group-hover:scale-110 transition-transform"></div>
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <Award size={48} className="text-primary-100 group-hover:text-primary-200 transition-colors" />
-                                        </div>
+                                <Link key={f._id} to={`/formations/${f._id}`} className="group bg-white dark:bg-secondary-900 rounded-[2.5rem] border border-gray-100 dark:border-secondary-800 hover:shadow-2xl transition-all p-4 animate-slide-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                                    <div className="aspect-square bg-gray-100 dark:bg-secondary-800 rounded-[2rem] relative overflow-hidden mb-6">
+                                        {f.image ? (
+                                            <img
+                                                src={f.image}
+                                                alt={f.titre}
+                                                className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center">
+                                                <Award size={56} className="text-white/40 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-700" />
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-secondary-900/5 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     </div>
                                     <div className="space-y-4">
                                         <h3 className="text-lg font-black text-secondary-900 line-clamp-2 leading-tight italic group-hover:text-primary-600 transition-colors">{f.titre}</h3>
                                         <div className="flex justify-between items-center text-[9px] font-black text-gray-300 uppercase tracking-widest pt-4 border-t border-gray-50 italic">
                                             <span>{f.nombreHeures} Heures</span>
-                                            <span className="text-secondary-900">{f.cout}€</span>
+                                            <span className="text-secondary-900">{f.cout} DH</span>
                                         </div>
                                     </div>
                                 </Link>

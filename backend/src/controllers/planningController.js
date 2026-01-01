@@ -1,4 +1,5 @@
 import Planning from '../models/Planning.js';
+import { sendEmail } from '../config/email.js';
 
 /**
  * @desc    Récupérer tous les plannings
@@ -75,7 +76,7 @@ export const getById = async (req, res) => {
  */
 export const create = async (req, res) => {
     try {
-        const { formationId, formateurId, dateDebut, dateFin } = req.body;
+        const { formateurId, dateDebut, dateFin } = req.body;
         const dDebut = new Date(dateDebut);
         const dFin = new Date(dateFin);
 
@@ -105,6 +106,83 @@ export const create = async (req, res) => {
 
         // Récupérer avec les relations
         const populatedPlanning = await Planning.findById(planning._id);
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const formationTitre = populatedPlanning.formationId?.titre || 'Session de formation';
+        const formateurNom = populatedPlanning.formateurId?.userId
+            ? `${populatedPlanning.formateurId.userId.prenom} ${populatedPlanning.formateurId.userId.nom}`
+            : 'Votre formateur';
+        const formateurEmail = populatedPlanning.formateurId?.userId?.email;
+        const entrepriseNom = populatedPlanning.entrepriseId?.nom || 'Session ouverte au public';
+        const entrepriseEmail = populatedPlanning.entrepriseId?.email;
+
+        const dateDebutStr = populatedPlanning.dateDebut
+            ? new Date(populatedPlanning.dateDebut).toLocaleDateString('fr-FR')
+            : '';
+        const dateFinStr = populatedPlanning.dateFin
+            ? new Date(populatedPlanning.dateFin).toLocaleDateString('fr-FR')
+            : '';
+
+        const heureDebut = populatedPlanning.heureDebut || '09:00';
+        const heureFin = populatedPlanning.heureFin || '17:00';
+        const lieu = populatedPlanning.lieu || 'À préciser';
+
+        try {
+            if (formateurEmail) {
+                await sendEmail({
+                    to: formateurEmail,
+                    subject: `Nouvelle session planifiée : ${formationTitre}`,
+                    text:
+                        `Bonjour ${formateurNom},\n\n` +
+                        `Une nouvelle session de formation vous a été planifiée.\n\n` +
+                        `Détails de la session :\n` +
+                        `- Formation : ${formationTitre}\n` +
+                        `- Client : ${entrepriseNom}\n` +
+                        `- Période : du ${dateDebutStr} au ${dateFinStr}\n` +
+                        `- Horaires : ${heureDebut} - ${heureFin}\n` +
+                        `- Lieu : ${lieu}\n\n` +
+                        `Consultez vos sessions depuis votre espace : ${frontendUrl}/formateur/sessions\n\n` +
+                        `Cordialement,\nL'équipe FormationsGest`
+                });
+            }
+
+            if (entrepriseEmail) {
+                await sendEmail({
+                    to: entrepriseEmail,
+                    subject: `Confirmation de session de formation : ${formationTitre}`,
+                    text:
+                        `Bonjour,\n\n` +
+                        `Une session de formation a été planifiée pour votre entreprise.\n\n` +
+                        `Détails de la session :\n` +
+                        `- Formation : ${formationTitre}\n` +
+                        `- Formateur : ${formateurNom}\n` +
+                        `- Période : du ${dateDebutStr} au ${dateFinStr}\n` +
+                        `- Horaires : ${heureDebut} - ${heureFin}\n` +
+                        `- Lieu : ${lieu}\n\n` +
+                        `Pour suivre vos formations, rendez-vous sur : ${frontendUrl}\n\n` +
+                        `Cordialement,\nL'équipe FormationsGest`
+                });
+            }
+
+            const adminEmail = process.env.ADMIN_EMAIL || 'admin@formationsgest.com';
+            if (adminEmail) {
+                await sendEmail({
+                    to: adminEmail,
+                    subject: `Nouveau planning créé : ${formationTitre}`,
+                    text:
+                        `Un nouveau planning de session vient d'être créé.\n\n` +
+                        `- Formation : ${formationTitre}\n` +
+                        `- Formateur : ${formateurNom}\n` +
+                        `- Client : ${entrepriseNom}\n` +
+                        `- Période : du ${dateDebutStr} au ${dateFinStr}\n` +
+                        `- Horaires : ${heureDebut} - ${heureFin}\n` +
+                        `- Lieu : ${lieu}\n\n` +
+                        `Consulter le planning complet : ${frontendUrl}/admin/plannings\n`
+                });
+            }
+        } catch (emailError) {
+            console.error('Erreur lors de l\'envoi des emails de création de planning:', emailError);
+        }
 
         res.status(201).json({
             success: true,
@@ -140,10 +218,89 @@ export const update = async (req, res) => {
             });
         }
 
+        const populatedPlanning = await Planning.findById(planning._id);
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const formationTitre = populatedPlanning.formationId?.titre || 'Session de formation';
+        const formateurNom = populatedPlanning.formateurId?.userId
+            ? `${populatedPlanning.formateurId.userId.prenom} ${populatedPlanning.formateurId.userId.nom}`
+            : 'Votre formateur';
+        const formateurEmail = populatedPlanning.formateurId?.userId?.email;
+        const entrepriseNom = populatedPlanning.entrepriseId?.nom || 'Session ouverte au public';
+        const entrepriseEmail = populatedPlanning.entrepriseId?.email;
+
+        const dateDebutStr = populatedPlanning.dateDebut
+            ? new Date(populatedPlanning.dateDebut).toLocaleDateString('fr-FR')
+            : '';
+        const dateFinStr = populatedPlanning.dateFin
+            ? new Date(populatedPlanning.dateFin).toLocaleDateString('fr-FR')
+            : '';
+
+        const heureDebut = populatedPlanning.heureDebut || '09:00';
+        const heureFin = populatedPlanning.heureFin || '17:00';
+        const lieu = populatedPlanning.lieu || 'À préciser';
+
+        try {
+            if (formateurEmail) {
+                await sendEmail({
+                    to: formateurEmail,
+                    subject: `Mise à jour de votre session : ${formationTitre}`,
+                    text:
+                        `Bonjour ${formateurNom},\n\n` +
+                        `Une session de formation planifiée pour vous vient d'être mise à jour.\n\n` +
+                        `Nouveaux détails de la session :\n` +
+                        `- Formation : ${formationTitre}\n` +
+                        `- Client : ${entrepriseNom}\n` +
+                        `- Période : du ${dateDebutStr} au ${dateFinStr}\n` +
+                        `- Horaires : ${heureDebut} - ${heureFin}\n` +
+                        `- Lieu : ${lieu}\n\n` +
+                        `Consultez vos sessions depuis votre espace : ${frontendUrl}/formateur/sessions\n\n` +
+                        `Cordialement,\nL'équipe FormationsGest`
+                });
+            }
+
+            if (entrepriseEmail) {
+                await sendEmail({
+                    to: entrepriseEmail,
+                    subject: `Mise à jour de la session de formation : ${formationTitre}`,
+                    text:
+                        `Bonjour,\n\n` +
+                        `Une session de formation planifiée pour votre entreprise vient d'être mise à jour.\n\n` +
+                        `Nouveaux détails de la session :\n` +
+                        `- Formation : ${formationTitre}\n` +
+                        `- Formateur : ${formateurNom}\n` +
+                        `- Période : du ${dateDebutStr} au ${dateFinStr}\n` +
+                        `- Horaires : ${heureDebut} - ${heureFin}\n` +
+                        `- Lieu : ${lieu}\n\n` +
+                        `Pour suivre vos formations, rendez-vous sur : ${frontendUrl}\n\n` +
+                        `Cordialement,\nL'équipe FormationsGest`
+                });
+            }
+
+            const adminEmail = process.env.ADMIN_EMAIL || 'admin@formationsgest.com';
+            if (adminEmail) {
+                await sendEmail({
+                    to: adminEmail,
+                    subject: `Planning mis à jour : ${formationTitre}`,
+                    text:
+                        `Un planning de session vient d'être mis à jour.\n\n` +
+                        `- Formation : ${formationTitre}\n` +
+                        `- Formateur : ${formateurNom}\n` +
+                        `- Client : ${entrepriseNom}\n` +
+                        `- Période : du ${dateDebutStr} au ${dateFinStr}\n` +
+                        `- Horaires : ${heureDebut} - ${heureFin}\n` +
+                        `- Lieu : ${lieu}\n\n` +
+                        `Consulter le planning complet : ${frontendUrl}/admin/plannings\n`
+                });
+            }
+        } catch (emailError) {
+            console.error('Erreur lors de l\'envoi des emails de mise à jour de planning:', emailError);
+        }
+
         res.status(200).json({
             success: true,
             message: 'Planning mis à jour avec succès.',
-            data: planning
+            data: populatedPlanning
         });
     } catch (error) {
         res.status(500).json({

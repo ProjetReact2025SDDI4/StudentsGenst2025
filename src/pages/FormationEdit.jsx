@@ -1,30 +1,31 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { formationAPI } from '../services/api';
 import {
     BookOpen,
     Clock,
     Banknote,
     MapPin,
-    List,
     Layers,
     CheckCircle2,
     ChevronLeft,
     Sparkles,
     Target,
     Zap,
+    Save,
     Image as ImageIcon,
     Upload
 } from 'lucide-react';
 import { InputField, TextAreaField, Button, SelectField } from '../components/UIComponents';
 
 /**
- * Création de Formation - Version Premium
- * Utilise les nouveaux composants UI pour une cohérence totale
+ * Édition de Formation - Version Premium
  */
-const FormationCreate = () => {
+const FormationEdit = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const fileInputRef = useRef(null);
     const [imagePreview, setImagePreview] = useState(null);
 
@@ -39,6 +40,37 @@ const FormationCreate = () => {
         type: 'INDIVIDU',
         image: null
     });
+
+    useEffect(() => {
+        const fetchFormation = async () => {
+            try {
+                const res = await formationAPI.getById(id);
+                const data = res.data.data;
+                setFormData({
+                    titre: data.titre || '',
+                    cout: data.cout || '',
+                    nombreHeures: data.nombreHeures || '',
+                    categorie: data.categorie || '',
+                    ville: data.ville || '',
+                    objectifs: Array.isArray(data.objectifs) ? data.objectifs.join('\n') : (data.objectifs || ''),
+                    programme: data.programme || '',
+                    type: data.type || 'INDIVIDU',
+                    image: null
+                });
+                if (data.image) {
+                    setImagePreview(data.image);
+                }
+            } catch (err) {
+                console.error('Erreur lors du chargement de la formation', err);
+                alert('Erreur lors du chargement de la formation');
+                navigate('/admin/formations');
+            } finally {
+                setFetching(false);
+            }
+        };
+
+        fetchFormation();
+    }, [id, navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -61,24 +93,35 @@ const FormationCreate = () => {
         setLoading(true);
         try {
             const data = new FormData();
+
             Object.keys(formData).forEach(key => {
-                if (key === 'image' && formData[key]) {
-                    data.append('image', formData[key]);
-                } else if (key !== 'image') {
+                if (key === 'image') {
+                    if (formData[key] instanceof File) {
+                        data.append('image', formData[key]);
+                    }
+                } else {
                     data.append(key, formData[key]);
                 }
             });
 
-            await formationAPI.create(data);
-            alert('Formation publiée avec succès !');
-            navigate('/admin/dashboard');
+            await formationAPI.update(id, data);
+            alert('Formation mise à jour avec succès !');
+            navigate('/admin/formations');
         } catch (err) {
-            console.error('Erreur lors de la création', err);
-            alert(err.response?.data?.message || 'Erreur lors de la création');
+            console.error('Erreur lors de la mise à jour', err);
+            alert(err.response?.data?.message || 'Erreur lors de la mise à jour');
         } finally {
             setLoading(false);
         }
     };
+
+    if (fetching) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-5xl mx-auto space-y-12 italic">
@@ -86,10 +129,10 @@ const FormationCreate = () => {
             <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-100 pb-10">
                 <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-[9px] font-black uppercase tracking-widest mb-4">
-                        <Sparkles size={12} /> Conception Académique
+                        <Sparkles size={12} /> Édition de Programme
                     </div>
-                    <h1 className="text-4xl font-black text-secondary-900 tracking-tighter italic">Nouveau Programme.</h1>
-                    <p className="text-gray-400 text-sm font-medium mt-1 italic">Définissez une formation d'élite pour le catalogue.</p>
+                    <h1 className="text-4xl font-black text-secondary-900 tracking-tighter italic">Modifier Formation.</h1>
+                    <p className="text-gray-400 text-sm font-medium mt-1 italic">Ajustez les détails du programme pédagogique.</p>
                 </div>
                 <Button variant="secondary" onClick={() => navigate(-1)} icon={ChevronLeft}>Retour</Button>
             </header>
@@ -210,17 +253,17 @@ const FormationCreate = () => {
                         </div>
 
                         <div className="pt-6 border-t border-white/10 relative z-10 italic">
-                            <p className="text-[10px] font-medium text-gray-500 leading-relaxed italic italic">En publiant ce programme, il sera immédiatement visible par les entreprises et les futurs stagiaires sur le catalogue public.</p>
+                            <p className="text-[10px] font-medium text-gray-500 leading-relaxed italic italic">Les modifications apportées seront immédiatement répercutées sur le catalogue public et pour toutes les nouvelles inscriptions.</p>
                         </div>
 
-                        <Button type="submit" variant="accent" loading={loading} className="w-full py-5 text-[11px] shadow-none relative z-10 italic italic">
-                            Publier au Catalogue
+                        <Button type="submit" variant="accent" loading={loading} icon={Save} className="w-full py-5 text-[11px] shadow-none relative z-10 italic italic">
+                            Enregistrer les Modifications
                         </Button>
                     </div>
 
                     <div className="bg-gray-50 rounded-[2.5rem] p-8 border border-gray-100 flex items-center gap-4 italic italic">
                         <CheckCircle2 className="text-emerald-500 shrink-0" size={24} />
-                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Prêt pour la mise en ligne</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Modifications prêtes</p>
                     </div>
                 </div>
             </form>
@@ -228,4 +271,4 @@ const FormationCreate = () => {
     );
 };
 
-export default FormationCreate;
+export default FormationEdit;

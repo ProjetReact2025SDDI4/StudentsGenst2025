@@ -13,10 +13,12 @@ import {
     Settings,
     LogOut,
     UserCircle,
-    Lock
+    Lock,
+    Sparkles,
+    X
 } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ onClose }) => {
     const { user, logout } = useContext(AuthContext);
     const location = useLocation();
     const navigate = useNavigate();
@@ -24,6 +26,12 @@ const Sidebar = () => {
     const handleLogout = () => {
         logout();
         navigate('/login');
+    };
+
+    const handleNavClick = () => {
+        if (window.innerWidth < 1024 && onClose) {
+            onClose();
+        }
     };
 
     const menuGroups = [
@@ -43,10 +51,15 @@ const Sidebar = () => {
             label: 'Académique',
             roles: ['ADMIN', 'ASSISTANT', 'FORMATEUR'],
             items: [
-                { label: 'Catalogue', path: '/formations', icon: BookOpen, roles: ['ADMIN', 'ASSISTANT', 'FORMATEUR'] },
+                { 
+                    label: user?.role === 'FORMATEUR' ? 'Catalogue' : 'Gestion Formations', 
+                    path: (user?.role === 'ADMIN' || user?.role === 'ASSISTANT') ? '/admin/formations' : '/formations', 
+                    icon: Calendar, 
+                    roles: ['ADMIN', 'ASSISTANT', 'FORMATEUR'] 
+                },
                 { label: 'Inscriptions', path: '/admin/inscriptions', icon: ClipboardList, roles: ['ADMIN', 'ASSISTANT'] },
                 {
-                    label: 'Sessions',
+                    label: 'Sessions & Planning',
                     path: user?.role === 'FORMATEUR' ? '/formateur/sessions' : '/admin/plannings',
                     icon: Calendar,
                     roles: ['ADMIN', 'ASSISTANT', 'FORMATEUR']
@@ -57,17 +70,17 @@ const Sidebar = () => {
             label: 'Ressources',
             roles: ['ADMIN', 'ASSISTANT'],
             items: [
-                { label: 'Formateurs', path: '/admin/formateurs', icon: Users, roles: ['ADMIN'] },
-                { label: 'Candidatures', path: '/admin/candidatures', icon: FileUser, roles: ['ADMIN'] },
+                { label: 'Corps Enseignant', path: '/admin/formateurs', icon: Users, roles: ['ADMIN'] },
+                { label: 'Recrutements', path: '/admin/candidatures', icon: FileUser, roles: ['ADMIN'] },
                 { label: 'Entreprises', path: '/admin/entreprises', icon: Building2, roles: ['ADMIN', 'ASSISTANT'] },
+                { label: 'Sécurité', path: '/mot-de-passe', icon: Lock, roles: ['ADMIN', 'ASSISTANT', 'FORMATEUR'] },
             ]
         },
         {
             label: 'Système',
-            roles: ['ADMIN', 'FORMATEUR'],
+            roles: ['ADMIN', 'ASSISTANT', 'FORMATEUR'],
             items: [
                 { label: 'Mon Profil', path: '/profil', icon: Settings, roles: ['ADMIN', 'ASSISTANT', 'FORMATEUR'] },
-
                 { label: 'Utilisateurs', path: '/admin/users', icon: UserCircle, roles: ['ADMIN'] },
                 {
                     label: 'Évaluations',
@@ -82,16 +95,29 @@ const Sidebar = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <aside className="w-72 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0 italic">
-            {/* Brand Logo */}
-            <div className="p-8 pb-12 flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20">
-                    <BookOpen size={24} />
+        <aside className="w-72 bg-white dark:bg-secondary-900 border-r border-gray-100 dark:border-secondary-800 flex flex-col h-full sticky top-0 italic">
+            {/* Brand Logo & Close button */}
+            <div className="p-8 pb-10 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="relative w-10 h-10 rounded-2xl bg-secondary-900 overflow-hidden shadow-lg shadow-primary-500/20">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-900" />
+                        <div className="absolute -right-1 -top-1 w-6 h-6 rounded-xl border border-white/20 bg-white/10" />
+                        <div className="absolute left-1 bottom-1 w-5 h-5 rounded-lg border border-white/30 bg-white/5" />
+                        <div className="relative w-full h-full flex items-center justify-center">
+                            <BookOpen size={20} className="text-white/80" />
+                        </div>
+                    </div>
+                    <div>
+                        <h1 className="text-xl font-black text-secondary-900 dark:text-gray-50 tracking-tighter">Formations<span className="text-primary-600">Gest</span>.</h1>
+                        <p className="text-[8px] font-black uppercase text-gray-300 dark:text-gray-500 tracking-[0.3em]">Premium ERP</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 className="text-xl font-black text-secondary-900 tracking-tighter">Formations<span className="text-primary-600">Gest</span>.</h1>
-                    <p className="text-[8px] font-black uppercase text-gray-300 tracking-[0.3em]">Premium ERP</p>
-                </div>
+                <button 
+                    onClick={onClose}
+                    className="lg:hidden p-2 text-gray-400 hover:text-secondary-900 transition-colors"
+                >
+                    <X size={20} />
+                </button>
             </div>
 
             {/* Navigation */}
@@ -108,6 +134,7 @@ const Sidebar = () => {
                                     <Link
                                         key={itemIdx}
                                         to={item.path}
+                                        onClick={handleNavClick}
                                         className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[11px] font-black tracking-widest transition-all duration-300 group
                                             ${isActive(item.path)
                                                 ? 'bg-primary-50 text-primary-600 shadow-sm'
@@ -133,8 +160,8 @@ const Sidebar = () => {
                         {user?.prenom?.charAt(0)}{user?.nom?.charAt(0)}
                     </div>
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-xs font-black text-secondary-900 truncate">{user?.prenom} {user?.nom}</p>
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest truncate">{user?.role}</p>
+                        <p className="text-xs font-black text-secondary-900 dark:text-gray-50 truncate">{user?.prenom} {user?.nom}</p>
+                        <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest truncate">{user?.role}</p>
                     </div>
                 </div>
                 <button

@@ -46,6 +46,15 @@ const candidatureFormateurSchema = new mongoose.Schema({
         type: String, // URL ou chemin du fichier CV
         trim: true
     },
+    documents: [{
+        url: String,
+        name: String,
+        type: String,
+        uploadedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     statut: {
         type: String,
         enum: {

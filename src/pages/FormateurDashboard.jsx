@@ -89,13 +89,20 @@ const FormateurDashboard = () => {
                     averages
                 });
             } catch (err) {
-                console.error('Erreur dashboard formateur');
+                console.error('Erreur dashboard formateur', err);
             } finally {
                 setLoading(false);
             }
         };
         fetchFormateurData();
     }, [user]);
+
+    const evaluationDimensions = [
+        { key: 'pedagogie', label: 'Pédagogie' },
+        { key: 'rythme', label: 'Rythme' },
+        { key: 'support', label: 'Support' },
+        { key: 'maitriseSujet', label: 'Maitrise' }
+    ];
 
     if (loading) return (
         <div className="space-y-10 animate-pulse italic">
@@ -258,21 +265,29 @@ const FormateurDashboard = () => {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
-                                    <span>Satisfaction</span>
+                                    <span>Satisfaction Globale</span>
                                     <span>{((stats.averageRating / 5) * 100).toFixed(0)}%</span>
                                 </div>
                                 <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                                     <div className="h-full bg-white transition-all duration-1000" style={{ width: `${(stats.averageRating / 5) * 100}%` }}></div>
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
-                                    <span>Volume Horaire</span>
-                                    <span>72%</span>
-                                </div>
-                                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                                    <div className="h-full bg-white/60 transition-all duration-1000" style={{ width: '72%' }}></div>
-                                </div>
+                            <div className="space-y-4">
+                                {evaluationDimensions.map(dim => {
+                                    const value = stats.averages[dim.key] || 0;
+                                    const percentage = (value / 5) * 100;
+                                    return (
+                                        <div key={dim.key} className="space-y-1">
+                                            <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
+                                                <span>{dim.label}</span>
+                                                <span>{value.toFixed(1)}/5</span>
+                                            </div>
+                                            <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+                                                <div className="h-full bg-white/70 transition-all duration-700" style={{ width: `${percentage}%` }}></div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                         <p className="mt-10 text-[10px] font-medium text-white/70 italic italic leading-relaxed">Continuez sur cette lancée ! Vous êtes dans le top 5% des formateurs les mieux notés ce trimestre.</p>

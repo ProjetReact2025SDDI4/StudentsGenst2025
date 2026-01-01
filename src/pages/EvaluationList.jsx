@@ -9,7 +9,8 @@ import {
     BookOpen,
     ChevronRight,
     Award,
-    Quote
+    Quote,
+    Download
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -30,7 +31,7 @@ const EvaluationList = () => {
             const res = await evaluationAPI.getAll();
             setEvaluations(res.data.data);
         } catch (err) {
-            console.error('Erreur chargement évaluations');
+            console.error('Erreur chargement évaluations', err);
         } finally {
             setLoading(false);
         }
@@ -45,6 +46,48 @@ const EvaluationList = () => {
         e.formateurId?.userId?.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         e.commentaire?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const exportToCsv = (rows, filename) => {
+        if (!rows || rows.length === 0) return;
+        const headers = Object.keys(rows[0]);
+        const escapeValue = (value) => {
+            if (value === null || value === undefined) return '""';
+            const str = String(value).replace(/"/g, '""');
+            return `"${str}"`;
+        };
+        const lines = [];
+        lines.push(headers.map(escapeValue).join(';'));
+        rows.forEach(row => {
+            const line = headers.map(h => escapeValue(row[h])).join(';');
+            lines.push(line);
+        });
+        const csvContent = lines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const handleExport = () => {
+        if (isFormateur || filtered.length === 0) return;
+        const rows = filtered.map(e => ({
+            Formation: e.formationId?.titre || '',
+            Formateur: e.formateurId?.userId ? `${e.formateurId.userId.prenom} ${e.formateurId.userId.nom}` : '',
+            NoteMoyenne: e.moyenne ?? '',
+            Pedagogie: e.notePedagogie ?? '',
+            MaitriseSujet: e.maitriseSujet ?? '',
+            Support: e.support ?? '',
+            Rythme: e.rythme ?? '',
+            Commentaire: e.commentaire || '',
+            Date: e.createdAt ? new Date(e.createdAt).toLocaleDateString('fr-FR') : ''
+        }));
+        exportToCsv(rows, 'evaluations.csv');
+    };
 
     const totalVisible = filtered.length;
 
@@ -69,6 +112,15 @@ const EvaluationList = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
+                    {!isFormateur && (
+                        <button
+                            type="button"
+                            onClick={handleExport}
+                            className="flex items-center gap-2 px-5 py-3 bg-gray-50 text-secondary-900 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-secondary-900 hover:text-white transition-all shadow-sm whitespace-nowrap"
+                        >
+                            <Download size={14} /> Exporter
+                        </button>
+                    )}
                 </div>
             </header>
 

@@ -86,7 +86,22 @@ export const getById = async (req, res) => {
  */
 export const create = async (req, res) => {
     try {
-        const formation = await Formation.create(req.body);
+        const formationData = { ...req.body };
+
+        if (typeof formationData.objectifs === 'string') {
+            formationData.objectifs = formationData.objectifs
+                .split('\n')
+                .map(o => o.trim())
+                .filter(o => o.length > 0)
+                .join('\n');
+        }
+
+        // Si une image a été uploadée
+        if (req.file) {
+            formationData.image = req.file.path;
+        }
+
+        const formation = await Formation.create(formationData);
 
         res.status(201).json({
             success: true,
@@ -94,10 +109,15 @@ export const create = async (req, res) => {
             data: formation
         });
     } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: Object.values(error.errors).map(e => e.message).join(' ')
+            });
+        }
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la création de la formation.',
-            error: error.message
+            message: error.message || 'Erreur lors de la création de la formation.'
         });
     }
 };
@@ -109,9 +129,24 @@ export const create = async (req, res) => {
  */
 export const update = async (req, res) => {
     try {
+        const formationData = { ...req.body };
+
+        if (typeof formationData.objectifs === 'string') {
+            formationData.objectifs = formationData.objectifs
+                .split('\n')
+                .map(o => o.trim())
+                .filter(o => o.length > 0)
+                .join('\n');
+        }
+
+        // Si une nouvelle image a été uploadée
+        if (req.file) {
+            formationData.image = req.file.path;
+        }
+
         const formation = await Formation.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            formationData,
             { new: true, runValidators: true }
         );
 
@@ -128,10 +163,15 @@ export const update = async (req, res) => {
             data: formation
         });
     } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: Object.values(error.errors).map(e => e.message).join(' ')
+            });
+        }
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la mise à jour de la formation.',
-            error: error.message
+            message: error.message || 'Erreur lors de la mise à jour de la formation.'
         });
     }
 };

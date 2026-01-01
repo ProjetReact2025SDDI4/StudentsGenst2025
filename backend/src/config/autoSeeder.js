@@ -19,7 +19,7 @@ export const seedDatabase = async () => {
         console.log('🌱 Initialisation des données par défaut...');
 
         // 1. Créer l'Admin
-        const admin = await User.create({
+        await User.create({
             nom: 'Admin',
             prenom: 'Super',
             email: 'admin@formationsgest.com',

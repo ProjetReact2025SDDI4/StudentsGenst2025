@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { formationAPI, inscriptionAPI, formateurAPI, candidatureAPI } from '../services/api';
 import {
     Users,
@@ -15,33 +15,40 @@ const AdminDashboard = () => {
         formations: 0,
         inscriptions: 0,
         formateurs: 0,
-        candidatures: 0
+        candidatures: 0,
+        evolutionInscriptions: []
     });
     const [loading, setLoading] = useState(true);
+    const [selectedPeriod, setSelectedPeriod] = useState(null);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const [f, i, fo, c] = await Promise.all([
+                const [f, i, fo, c, evolRes] = await Promise.all([
                     formationAPI.getAll(),
                     inscriptionAPI.getAll(),
                     formateurAPI.getAll(),
-                    candidatureAPI.getAll()
+                    candidatureAPI.getAll(),
+                    inscriptionAPI.getEvolutionStats({ months: 6 })
                 ]);
                 setStats({
                     formations: f.data.total || f.data.data.length,
                     inscriptions: i.data.data.length,
                     formateurs: fo.data.data.length,
-                    candidatures: c.data.data.length
+                    candidatures: c.data.data.length,
+                    evolutionInscriptions: evolRes.data.data || []
                 });
             } catch (err) {
-                console.error('Erreur chargement stats');
+                console.error('Erreur chargement stats', err);
             } finally {
                 setLoading(false);
             }
         };
         fetchStats();
     }, []);
+
+    const evolutionData = stats.evolutionInscriptions || [];
+    const maxTotal = evolutionData.reduce((max, p) => Math.max(max, p.total), 0);
 
     const statCards = [
         { label: 'Programmes', value: stats.formations, icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -94,20 +101,120 @@ const AdminDashboard = () => {
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
-                {/* Recent Overview (Mock for now, but clean) */}
                 <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
                     <div className="flex justify-between items-center mb-10">
                         <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
                             Évolution des Inscriptions
                         </h2>
-                        <button className="text-[10px] font-black uppercase text-primary-600 tracking-widest hover:underline">Voir détails</button>
+                        {selectedPeriod && (
+                            <div className="text-right space-y-1">
+                                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                                    {selectedPeriod.month.toString().padStart(2, '0')}/{selectedPeriod.year}
+                                </p>
+                                <p className="text-xs font-black text-secondary-900">
+                                    {selectedPeriod.total} inscriptions
+                                </p>
+                            </div>
+                        )}
                     </div>
-                    <div className="aspect-[16/7] bg-gray-50/50 rounded-3xl border border-dashed border-gray-200 flex items-center justify-center relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-t from-primary-500/5 to-transparent"></div>
-                        <p className="text-gray-300 text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3">
-                            Graphique analytique <ArrowUpRight size={16} />
-                        </p>
-                    </div>
+                    {evolutionData.length === 0 ? (
+                        <div className="aspect-[16/7] bg-gray-50/50 rounded-3xl border border-dashed border-gray-200 flex items-center justify-center relative overflow-hidden">
+                            <p className="text-gray-300 text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3">
+                                Aucune donnée suffisante pour le moment
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            <div className="flex items-end gap-4 h-56">
+                                {evolutionData.map(period => {
+                                    const isActive = selectedPeriod && selectedPeriod.period === period.period;
+                                    const total = period.total || 0;
+                                    const baseHeight = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+                                    const barHeight = total === 0 ? 0 : 20 + (baseHeight * 0.8);
+
+                                    const enAttenteRatio = total > 0 ? (period.EN_ATTENTE / total) * 100 : 0;
+                                    const confirmeeRatio = total > 0 ? (period.CONFIRMEE / total) * 100 : 0;
+                                    const termineeRatio = total > 0 ? (period.TERMINEE / total) * 100 : 0;
+                                    const annuleeRatio = total > 0 ? (period.ANNULEE / total) * 100 : 0;
+
+                                    return (
+                                        <button
+                                            key={period.period}
+                                            type="button"
+                                            onClick={() => setSelectedPeriod(period)}
+                                            className="flex flex-col items-center gap-3 flex-1 group"
+                                        >
+                                            <div className="w-full flex-1 flex items-end justify-center">
+                                                <div
+                                                    className={`w-6 sm:w-8 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden flex flex-col justify-end transition-all duration-300 ${isActive ? 'border-primary-300 shadow-lg shadow-primary-100 scale-[1.05]' : 'group-hover:shadow-md group-hover:scale-[1.02]'}`}
+                                                    style={{ height: `${barHeight}%` }}
+                                                >
+                                                    {total > 0 && (
+                                                        <>
+                                                            <div
+                                                                className="bg-amber-400"
+                                                                style={{ height: `${enAttenteRatio}%` }}
+                                                            />
+                                                            <div
+                                                                className="bg-emerald-500"
+                                                                style={{ height: `${confirmeeRatio}%` }}
+                                                            />
+                                                            <div
+                                                                className="bg-secondary-900"
+                                                                style={{ height: `${termineeRatio}%` }}
+                                                            />
+                                                            <div
+                                                                className="bg-gray-300"
+                                                                style={{ height: `${annuleeRatio}%` }}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1 text-center">
+                                                <p className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-secondary-900' : 'text-gray-400'}`}>
+                                                    {new Date(period.year, period.month - 1, 1).toLocaleString('fr-FR', { month: 'short' })}
+                                                </p>
+                                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                                    {total} doss.
+                                                </p>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex flex-wrap items-center justify-between gap-4 text-[9px] font-black uppercase tracking-widest text-gray-400">
+                                    <div className="flex items-center gap-3">
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <span className="w-3 h-3 rounded-full bg-amber-400" /> En attente
+                                        </span>
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <span className="w-3 h-3 rounded-full bg-emerald-500" /> Confirmées
+                                        </span>
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <span className="w-3 h-3 rounded-full bg-secondary-900" /> Terminées
+                                        </span>
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <span className="w-3 h-3 rounded-full bg-gray-300" /> Annulées
+                                        </span>
+                                    </div>
+                                    <div className="text-[9px] font-black text-primary-600 uppercase tracking-widest">
+                                        Vue analytique • 6 derniers mois
+                                    </div>
+                                </div>
+                                {selectedPeriod && (
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex flex-wrap gap-3">
+                                        <span>En attente: {selectedPeriod.EN_ATTENTE}</span>
+                                        <span>Confirmées: {selectedPeriod.CONFIRMEE}</span>
+                                        <span>Terminées: {selectedPeriod.TERMINEE}</span>
+                                        <span>Annulées: {selectedPeriod.ANNULEE}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Status Card */}

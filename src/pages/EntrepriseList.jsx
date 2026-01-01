@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { entrepriseAPI } from '../services/api';
+import { useConfirm } from '../context/ConfirmContext';
 import {
     Building2,
     Search,
@@ -21,6 +22,7 @@ import { InputField, Button } from '../components/UIComponents';
  * UX Premium avec Modals pour le CRUD
  */
 const EntrepriseList = () => {
+    const confirm = useConfirm();
     const [entreprises, setEntreprises] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -51,7 +53,7 @@ const EntrepriseList = () => {
             const res = await entrepriseAPI.getAll();
             setEntreprises(res.data.data);
         } catch (err) {
-            console.error('Erreur chargement entreprises');
+            console.error('Erreur chargement entreprises', err);
         } finally {
             setLoading(false);
         }
@@ -95,6 +97,7 @@ const EntrepriseList = () => {
             setIsModalOpen(false);
             fetchEntreprises();
         } catch (err) {
+            console.error('Erreur lors de l\'enregistrement', err);
             alert('Erreur lors de l\'enregistrement');
         } finally {
             setFormLoading(false);
@@ -102,11 +105,19 @@ const EntrepriseList = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Supprimer cette entreprise et ses accès ?')) {
+        const isConfirmed = await confirm({
+            title: 'Supprimer le compte client ?',
+            message: 'Toutes les informations relatives à cette entreprise seront archivées. Les inscriptions en cours ne seront pas annulées automatiquement.',
+            type: 'danger',
+            confirmText: 'Confirmer la suppression'
+        });
+
+        if (isConfirmed) {
             try {
                 await entrepriseAPI.delete(id);
                 fetchEntreprises();
             } catch (err) {
+                console.error('Erreur suppression', err);
                 alert('Erreur suppression');
             }
         }
