@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { authAPI } from '../services/api';
-import { Lock, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Lock, ShieldCheck, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
 const ChangePassword = () => {
     const [formData, setFormData] = useState({
@@ -11,6 +11,9 @@ const ChangePassword = () => {
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -81,41 +84,71 @@ const ChangePassword = () => {
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-300 ml-1">Mot de passe actuel</label>
-                        <input
-                            type="password"
-                            name="currentPassword"
-                            required
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
-                            placeholder="••••••••"
-                            value={formData.currentPassword}
-                            onChange={handleChange}
-                        />
+                        <div className="relative">
+                            <input
+                                type={showCurrentPassword ? 'text' : 'password'}
+                                name="currentPassword"
+                                required
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-11 px-6 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
+                                placeholder="••••••••"
+                                value={formData.currentPassword}
+                                onChange={handleChange}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowCurrentPassword(prev => !prev)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-300 transition-colors flex items-center justify-center"
+                                aria-label={showCurrentPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                            >
+                                {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-300 ml-1">Nouveau mot de passe</label>
-                            <input
-                                type="password"
-                                name="newPassword"
-                                required
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
-                                placeholder="••••••••"
-                                value={formData.newPassword}
-                                onChange={handleChange}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showNewPassword ? 'text' : 'password'}
+                                    name="newPassword"
+                                    required
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-11 px-6 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
+                                    placeholder="••••••••"
+                                    value={formData.newPassword}
+                                    onChange={handleChange}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNewPassword(prev => !prev)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-300 transition-colors flex items-center justify-center"
+                                    aria-label={showNewPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                                >
+                                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-300 ml-1">Confirmer le nouveau mot de passe</label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                required
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
-                                placeholder="••••••••"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    name="confirmPassword"
+                                    required
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-11 px-6 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
+                                    placeholder="••••••••"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(prev => !prev)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-300 transition-colors flex items-center justify-center"
+                                    aria-label={showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -135,4 +168,3 @@ const ChangePassword = () => {
 };
 
 export default ChangePassword;
-

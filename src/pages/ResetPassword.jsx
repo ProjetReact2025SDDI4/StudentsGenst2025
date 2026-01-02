@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Lock, ArrowLeft, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Lock, ArrowLeft, ShieldCheck, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../services/api';
 
 const ResetPassword = () => {
@@ -10,6 +10,8 @@ const ResetPassword = () => {
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -76,13 +78,21 @@ const ResetPassword = () => {
                             <div className="relative">
                                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     required
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-11 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(prev => !prev)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-300 transition-colors flex items-center justify-center"
+                                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
                             </div>
                         </div>
 
@@ -90,14 +100,24 @@ const ResetPassword = () => {
                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 ml-1">
                                 Confirmer le mot de passe
                             </label>
-                            <input
-                                type="password"
-                                required
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
-                                placeholder="••••••••"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    required
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-11 pl-4 text-sm font-bold text-white placeholder-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-300 outline-none"
+                                    placeholder="••••••••"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(prev => !prev)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-300 transition-colors flex items-center justify-center"
+                                    aria-label={showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </div>
 
                         <button

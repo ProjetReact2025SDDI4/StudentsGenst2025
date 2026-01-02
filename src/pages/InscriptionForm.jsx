@@ -79,7 +79,7 @@ const InscriptionForm = () => {
 
     return (
         <div className="bg-gradient-to-b from-white via-gray-50 to-white dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 min-h-screen flex flex-col lg:flex-row italic">
-            <div className="lg:w-1/3 bg-primary-600 p-12 lg:p-20 text-white flex flex-col justify-center sticky top-0 lg:h-screen overflow-hidden">
+            <div className="w-full lg:w-1/3 bg-primary-600 p-8 md:p-12 lg:p-20 text-white flex flex-col justify-center lg:sticky lg:top-0 lg:h-screen overflow-hidden">
                 <Link to={`/formations/${id}`} className="absolute top-8 left-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors group">
                     <span className="group-hover:-translate-x-1 transition-transform">←</span> Retour
                 </Link>
@@ -102,7 +102,7 @@ const InscriptionForm = () => {
                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-secondary-900 rounded-full blur-[100px] opacity-20"></div>
             </div>
 
-            <div className="flex-1 p-8 lg:p-24 flex items-center justify-center">
+            <div className="flex-1 px-4 py-10 sm:p-8 lg:p-24 flex items-start lg:items-center justify-center">
                 <div className="max-w-xl w-full">
                     {success ? (
                         <div className="bg-white border border-emerald-100 rounded-[3rem] p-16 text-center animate-slide-up shadow-2xl shadow-emerald-500/5">
