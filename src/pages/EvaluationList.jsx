@@ -101,7 +101,7 @@ const EvaluationList = () => {
                         {totalVisible} feedback(s) affiché(s)
                     </p>
                 </div>
-                <div className="flex gap-4 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto">
                     <div className="relative flex-1 md:w-80 group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" size={18} />
                         <input

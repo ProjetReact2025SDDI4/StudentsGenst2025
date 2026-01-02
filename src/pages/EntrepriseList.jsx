@@ -135,7 +135,7 @@ const EntrepriseList = () => {
                     <h1 className="text-3xl font-black text-secondary-900 tracking-tighter italic">Sociétés Clientes.</h1>
                     <p className="text-gray-400 text-sm font-medium mt-1">Gérez le portefeuille d'entreprises et leurs formations groupées.</p>
                 </div>
-                <div className="flex gap-4 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto">
                     <div className="relative flex-1 md:w-80">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                         <input

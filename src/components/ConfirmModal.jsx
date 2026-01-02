@@ -30,15 +30,13 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText,
     };
 
     return (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 sm:p-6 italic">
-            {/* Backdrop */}
+        <div className="fixed inset-0 z-[2000] flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto italic">
             <div
                 className="absolute inset-0 bg-secondary-900/80 backdrop-blur-md transition-opacity"
                 onClick={onClose}
             ></div>
 
-            {/* Modal Content */}
-            <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl overflow-hidden animate-slide-up p-10 space-y-8">
+            <div className="relative bg-white w-full max-w-sm sm:max-w-md rounded-[3rem] shadow-2xl overflow-hidden animate-slide-up my-8 sm:my-10 p-6 sm:p-10 space-y-8">
                 <div className="flex flex-col items-center text-center space-y-4">
                     <div className={`p-4 rounded-3xl bg-gray-50 mb-2`}>
                         {icons[type] || icons.danger}

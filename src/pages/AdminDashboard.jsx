@@ -58,32 +58,30 @@ const AdminDashboard = () => {
     ];
 
     if (loading) return <div className="animate-pulse space-y-8">
-        <div className="h-12 w-64 bg-gray-100 rounded-xl"></div>
-        <div className="grid grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-gray-100 rounded-3xl"></div>)}
+        <div className="h-10 w-40 sm:w-64 bg-gray-100 rounded-xl"></div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 sm:h-32 bg-gray-100 rounded-3xl"></div>)}
         </div>
     </div>;
 
     return (
         <div className="space-y-10 italic">
-            {/* Header section */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-secondary-900 tracking-tighter">Tableau de Bord</h1>
                     <p className="text-gray-400 text-sm font-medium mt-1">Analyse globale de votre centre de formation.</p>
                 </div>
-                <div className="flex gap-3">
-                    <div className="bg-white p-2 px-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2">
+                <div className="flex w-full md:w-auto justify-start md:justify-end">
+                    <div className="bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2">
                         <Clock size={16} className="text-gray-400" />
                         <span className="text-[10px] font-black text-secondary-900 uppercase tracking-widest">Dernière mise à jour: Live</span>
                     </div>
                 </div>
             </div>
 
-            {/* Quick Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {statCards.map((stat, i) => (
-                    <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div key={i} className="bg-white p-6 sm:p-7 lg:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                         <div className="flex justify-between items-start mb-6">
                             <div className={`p-4 ${stat.bg} ${stat.color} rounded-2xl transition-transform group-hover:scale-110`}>
                                 <stat.icon size={24} />
@@ -101,8 +99,8 @@ const AdminDashboard = () => {
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
-                    <div className="flex justify-between items-center mb-10">
+                <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-10">
                         <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
                             Évolution des Inscriptions
                         </h2>
@@ -125,7 +123,8 @@ const AdminDashboard = () => {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            <div className="flex items-end gap-4 h-56">
+                            <div className="overflow-x-auto pb-2">
+                                <div className="flex items-end gap-4 h-56 min-w-max">
                                 {evolutionData.map(period => {
                                     const isActive = selectedPeriod && selectedPeriod.period === period.period;
                                     const total = period.total || 0;
@@ -182,6 +181,7 @@ const AdminDashboard = () => {
                                         </button>
                                     );
                                 })}
+                                </div>
                             </div>
 
                             <div className="space-y-3">
@@ -217,8 +217,7 @@ const AdminDashboard = () => {
                     )}
                 </div>
 
-                {/* Status Card */}
-                <div className="bg-secondary-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
+                <div className="bg-secondary-900 rounded-[2.5rem] p-6 sm:p-8 lg:p-10 text-white shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600 rounded-full blur-[120px] opacity-20 -mr-32 -mt-32"></div>
                     <h2 className="text-xl font-black mb-10 relative z-10 italic">Performance Cloud</h2>
                     <div className="space-y-8 relative z-10">

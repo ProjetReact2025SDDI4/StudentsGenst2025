@@ -196,7 +196,7 @@ const PlanningList = () => {
                     </h1>
                     <p className="text-gray-400 text-sm font-medium mt-2">Coordonnez les sessions de formation et les intervenants.</p>
                 </div>
-                <div className="flex gap-4 w-full md:w-auto animate-slide-up" style={{ animationDelay: '100ms' }}>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto animate-slide-up" style={{ animationDelay: '100ms' }}>
                     <div className="relative flex-1 md:w-72 group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" size={16} />
                         <input
@@ -394,7 +394,7 @@ const PlanningList = () => {
                     title="Détails de la session"
                 >
                     <div className="space-y-6 italic">
-                        <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 bg-gray-50 rounded-2xl">
                             <div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-secondary-900 text-white">
                                 <span className="text-[9px] font-black uppercase tracking-widest opacity-70">
                                     {new Date(selectedSession.dateDebut).toLocaleString('fr-FR', { month: 'short' })}
@@ -450,7 +450,7 @@ const PlanningList = () => {
 
                         <div className="space-y-3">
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Formateur</h4>
-                            <div className="p-4 border border-gray-100 rounded-2xl flex items-center gap-4">
+                            <div className="p-4 border border-gray-100 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                 <div className="w-10 h-10 rounded-xl bg-secondary-900 text-white flex items-center justify-center text-[11px] font-black">
                                     {selectedSession.formateurId?.userId?.prenom?.[0]}{selectedSession.formateurId?.userId?.nom?.[0]}
                                 </div>

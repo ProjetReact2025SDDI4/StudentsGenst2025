@@ -53,9 +53,9 @@ const EntrepriseCreate = () => {
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen p-8">
+        <div className="bg-gray-50 min-h-screen px-4 py-10 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-                <div className="card-glass p-10 shadow-2xl animate-fade-in">
+                <div className="card-glass p-6 sm:p-8 lg:p-10 shadow-2xl animate-fade-in">
                     <h1 className="text-3xl font-black text-secondary-900 mb-8 pb-4 border-b">Nouvelle Entreprise Cliente</h1>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
@@ -108,7 +108,7 @@ const EntrepriseCreate = () => {
                             </div>
                         </div>
 
-                        <div className="flex gap-4 pt-6">
+                        <div className="flex flex-col sm:flex-row gap-4 pt-6">
                             <button type="button" onClick={() => navigate('/admin/entreprises')} className="btn-secondary flex-1">Annuler</button>
                             <button type="submit" disabled={loading} className="btn-primary flex-[2]">
                                 {loading ? 'Création...' : 'Enregistrer l\'entreprise'}

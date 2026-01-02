@@ -53,7 +53,7 @@ const FormateurList = () => {
                     </h1>
                     <p className="text-gray-400 text-sm font-medium mt-2">Experts certifiés et intervenants spécialisés.</p>
                 </div>
-                <div className="flex gap-4 w-full md:w-auto animate-slide-up" style={{ animationDelay: '100ms' }}>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto animate-slide-up" style={{ animationDelay: '100ms' }}>
                     <div className="relative flex-1 md:w-72 group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" size={16} />
                         <input

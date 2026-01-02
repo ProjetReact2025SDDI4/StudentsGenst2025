@@ -22,17 +22,14 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6 italic">
-            {/* Backdrop avec flou premium */}
+        <div className="fixed inset-0 z-[1000] flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto italic">
             <div
                 className="absolute inset-0 bg-secondary-900/60 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             ></div>
 
-            {/* Modal Content */}
-            <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-up">
-                {/* Header */}
-                <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center">
+            <div className="relative bg-white w-full max-w-lg sm:max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-up my-8 sm:my-10">
+                <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-50 flex justify-between items-center">
                     <h3 className="text-xl font-black text-secondary-900 tracking-tighter italic">{title}</h3>
                     <button
                         onClick={onClose}
@@ -42,8 +39,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
                     </button>
                 </div>
 
-                {/* Body (scrollable) */}
-                <div className="px-8 py-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                <div className="px-4 sm:px-8 py-6 sm:py-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
                     {children}
                 </div>
             </div>

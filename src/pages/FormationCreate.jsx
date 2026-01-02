@@ -81,9 +81,8 @@ const FormationCreate = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-12 italic">
-            {/* Header */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-100 pb-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-0 space-y-12 italic">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 border-b border-gray-100 pb-8 md:pb-10">
                 <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-[9px] font-black uppercase tracking-widest mb-4">
                         <Sparkles size={12} /> Conception Académique
@@ -94,10 +93,9 @@ const FormationCreate = () => {
                 <Button variant="secondary" onClick={() => navigate(-1)} icon={ChevronLeft}>Retour</Button>
             </header>
 
-            <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-12">
-                {/* Left Column: Essential Info */}
+            <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-10 lg:gap-12">
                 <div className="lg:col-span-2 space-y-10">
-                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm space-y-8">
+                    <div className="bg-white rounded-[3rem] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm space-y-8">
                         <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
                             <BookOpen className="text-primary-500" size={24} /> 01. Identité du Cursus
                         </h2>
@@ -132,7 +130,7 @@ const FormationCreate = () => {
                         />
                     </div>
 
-                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm space-y-8">
+                    <div className="bg-white rounded-[3rem] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm space-y-8">
                         <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
                             <Target className="text-primary-500" size={24} /> 02. Objectifs & Programme
                         </h2>
@@ -149,7 +147,7 @@ const FormationCreate = () => {
                             placeholder="Détaillez le syllabus par modules..."
                         />
                     </div>
-                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm space-y-8">
+                    <div className="bg-white rounded-[3rem] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm space-y-8">
                         <h2 className="text-xl font-black text-secondary-900 flex items-center gap-3 italic">
                             <ImageIcon className="text-primary-500" size={24} /> 03. Visuel de la Formation
                         </h2>
@@ -187,9 +185,8 @@ const FormationCreate = () => {
                     </div>
                 </div>
 
-                {/* Right Column: Key Stats & Submit */}
                 <div className="space-y-10">
-                    <div className="bg-secondary-900 rounded-[3rem] p-10 text-white shadow-2xl space-y-10 relative overflow-hidden">
+                    <div className="bg-secondary-900 rounded-[3rem] p-6 sm:p-8 lg:p-10 text-white shadow-2xl space-y-10 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600 rounded-full blur-[80px] opacity-20 -mr-16 -mt-16"></div>
 
                         <h2 className="text-xl font-black italic relative z-10 flex items-center gap-2">
@@ -218,7 +215,7 @@ const FormationCreate = () => {
                         </Button>
                     </div>
 
-                    <div className="bg-gray-50 rounded-[2.5rem] p-8 border border-gray-100 flex items-center gap-4 italic italic">
+                    <div className="bg-gray-50 rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 flex items-center gap-4 italic italic">
                         <CheckCircle2 className="text-emerald-500 shrink-0" size={24} />
                         <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Prêt pour la mise en ligne</p>
                     </div>

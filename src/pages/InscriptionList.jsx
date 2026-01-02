@@ -149,7 +149,7 @@ const InscriptionList = () => {
                     <h1 className="text-3xl font-black text-secondary-900 tracking-tighter italic">Registre Stagiaires.</h1>
                     <p className="text-gray-400 text-sm font-medium mt-1">Suivi administratif des dossiers d'inscription.</p>
                 </div>
-                <div className="flex gap-4 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto">
                     <div className="relative flex-1 md:w-80 group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" size={18} />
                         <input
@@ -253,7 +253,7 @@ const InscriptionList = () => {
             >
                 {selectedIns && (
                     <div className="space-y-10 italic">
-                        <div className="flex items-center gap-6 p-6 bg-gray-50 rounded-[2rem]">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-6 bg-gray-50 rounded-[2rem]">
                             <div className="w-20 h-20 bg-secondary-900 text-white rounded-[1.5rem] flex items-center justify-center text-3xl font-black italic">
                                 {selectedIns.prenom[0]}{selectedIns.nom[0]}
                             </div>

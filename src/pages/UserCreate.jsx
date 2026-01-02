@@ -54,9 +54,9 @@ const UserCreate = () => {
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-gray-50 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100">
-                <div className="bg-secondary-900 p-10 text-white relative">
+                <div className="bg-secondary-900 p-6 sm:p-8 lg:p-10 text-white relative">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500 rounded-full blur-[80px] opacity-20 -mr-16 -mt-16"></div>
                     <button
                         onClick={() => navigate(-1)}
@@ -68,13 +68,13 @@ const UserCreate = () => {
                     <p className="text-gray-400 text-sm mt-2 font-medium">Ajoutez un nouveau membre au personnel administratif.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-10 space-y-8 italic">
+                <form onSubmit={handleSubmit} className="p-6 sm:p-8 lg:p-10 space-y-8 italic">
                     {error && (
                         <div className="mb-4 rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-xs font-medium text-red-700">
                             {error}
                         </div>
                     )}
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Prénom</label>
                             <input
@@ -111,7 +111,7 @@ const UserCreate = () => {
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Mot de passe</label>
                             <input

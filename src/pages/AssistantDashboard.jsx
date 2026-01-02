@@ -85,41 +85,40 @@ const AssistantDashboard = () => {
     const evolutionData = stats.evolutionInscriptions || [];
     const maxTotal = evolutionData.reduce((max, p) => Math.max(max, p.total), 0);
 
-    if (loading) return (
+    if (loading) 
+        return (
         <div className="space-y-10 animate-pulse">
-            <div className="h-10 w-64 bg-gray-100 rounded-lg"></div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-gray-100 rounded-[2rem]"></div>)}
+            <div className="h-10 w-40 sm:w-64 bg-gray-100 rounded-lg"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                {[1, 2, 3, 4].map(i => <div key={i} className="h-24 sm:h-32 bg-gray-100 rounded-[2rem]"></div>)}
             </div>
-            <div className="grid lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 h-96 bg-gray-100 rounded-[3rem]"></div>
-                <div className="h-96 bg-gray-100 rounded-[3rem]"></div>
+            <div className="grid lg:grid-cols-3 gap-6 lg:gap-10">
+                <div className="lg:col-span-2 h-64 sm:h-80 lg:h-96 bg-gray-100 rounded-[3rem]"></div>
+                <div className="h-64 sm:h-80 lg:h-96 bg-gray-100 rounded-[3rem]"></div>
             </div>
         </div>
     );
 
     return (
         <div className="space-y-10 italic">
-            {/* Header Section */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
                 <div>
                     <h1 className="text-3xl font-black text-secondary-900 tracking-tighter italic">Espace Logistique.</h1>
                     <p className="text-gray-400 text-sm font-medium mt-1">Coordonnez les ressources et gérez les flux académiques.</p>
                 </div>
-                <div className="flex gap-4">
-                    <button className="p-3.5 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-secondary-900 transition-all shadow-sm">
+                <div className="flex flex-wrap gap-3 w-full md:w-auto justify-start md:justify-end">
+                    <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-secondary-900 transition-all shadow-sm">
                         <Search size={20} />
                     </button>
                     <Link
                         to="/admin/plannings"
-                        className="bg-secondary-900 text-white px-6 py-3.5 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 active:scale-95"
+                        className="flex-1 md:flex-none justify-center bg-secondary-900 text-white px-4 sm:px-6 py-3 rounded-2xl flex items-center gap-2 sm:gap-3 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 active:scale-95 text-center"
                     >
                         <Calendar size={18} /> Voir le Planning
                     </Link>
                 </div>
             </header>
 
-            {/* Quick Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                     { label: 'Inscriptions', value: stats.pendingInscriptions.length, icon: Users, color: 'text-primary-600', bg: 'bg-primary-50', trend: 'À traiter' },
@@ -127,7 +126,7 @@ const AssistantDashboard = () => {
                     { label: 'Sociétés', value: stats.totalEntreprises, icon: Building2, color: 'text-emerald-600', bg: 'bg-emerald-50', trend: 'Portfolio actif' },
                     { label: 'Performance', value: '94%', icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50', trend: '+12% ce mois' }
                 ].map((stat, i) => (
-                    <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 group flex items-center justify-between">
+                    <div key={i} className="bg-white p-6 sm:p-7 lg:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 group flex items-center justify-between">
                         <div className="space-y-3">
                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.label}</p>
                             <h3 className="text-3xl font-black text-secondary-900 tracking-tighter italic">{stat.value}</h3>
@@ -140,10 +139,10 @@ const AssistantDashboard = () => {
                 ))}
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-10">
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-10">
                 <div className="lg:col-span-2 space-y-10">
-                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
-                        <div className="flex justify-between items-center mb-10">
+                    <div className="bg-white rounded-[3rem] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sm:mb-10">
                             <div className="flex items-center gap-3">
                                 <div className="p-3 bg-secondary-900 rounded-xl text-white">
                                     <Clock size={20} />
@@ -155,21 +154,23 @@ const AssistantDashboard = () => {
 
                         <div className="space-y-4">
                             {stats.nextSessions.map((session, i) => (
-                                <div key={i} className="group p-6 bg-gray-50/50 rounded-3xl border border-transparent hover:border-primary-100 hover:bg-white transition-all flex items-center justify-between">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-secondary-900 shadow-sm transition-transform group-hover:scale-105">
+                                <div key={i} className="group p-5 sm:p-6 bg-gray-50/50 rounded-3xl border border-transparent hover:border-primary-100 hover:bg-white transition-all flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 justify-between">
+                                    <div className="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
+                                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-secondary-900 shadow-sm transition-transform group-hover:scale-105">
                                             <span className="text-[9px] font-black uppercase">{new Date(session.dateDebut).toLocaleString('fr-FR', { month: 'short' })}</span>
                                             <span className="text-xl font-black leading-none">{new Date(session.dateDebut).getDate()}</span>
                                         </div>
-                                        <div className="space-y-1">
-                                            <h4 className="text-sm font-black text-secondary-900 italic line-clamp-1">{session.formationId?.titre}</h4>
-                                            <div className="flex items-center gap-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                        <div className="space-y-1 min-w-0">
+                                            <h4 className="text-sm font-black text-secondary-900 italic line-clamp-2 sm:line-clamp-1">{session.formationId?.titre}</h4>
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">
                                                 <span className="flex items-center gap-1.5"><Clock size={12} className="text-primary-500" /> {session.heureDebut}</span>
                                                 <span className="flex items-center gap-1.5"><Briefcase size={12} className="text-primary-500" /> {session.formateurId?.userId?.prenom} {session.formateurId?.userId?.nom}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <button className="p-3 text-gray-300 hover:text-secondary-900 transition-colors"><MoreHorizontal size={20} /></button>
+                                    <button className="self-end sm:self-auto mt-1 sm:mt-0 p-2 sm:p-3 text-gray-300 hover:text-secondary-900 transition-colors">
+                                        <MoreHorizontal size={20} />
+                                    </button>
                                 </div>
                             ))}
                             {stats.nextSessions.length === 0 && (
@@ -181,8 +182,8 @@ const AssistantDashboard = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
-                        <div className="flex justify-between items-center mb-8">
+                    <div className="bg-white rounded-[3rem] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
                             <div className="flex items-center gap-3">
                                 <div className="p-3 bg-primary-50 rounded-xl text-primary-600">
                                     <TrendingUp size={20} />
@@ -210,7 +211,8 @@ const AssistantDashboard = () => {
                             </div>
                         ) : (
                             <div className="space-y-6">
-                                <div className="flex items-end gap-4 h-56">
+                                <div className="overflow-x-auto pb-2">
+                                    <div className="flex items-end gap-4 h-56 min-w-max">
                                     {evolutionData.map(period => {
                                         const isActive = selectedPeriod && selectedPeriod.period === period.period;
                                         const total = period.total || 0;
@@ -267,6 +269,7 @@ const AssistantDashboard = () => {
                                             </button>
                                         );
                                     })}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-3">
@@ -303,9 +306,8 @@ const AssistantDashboard = () => {
                     </div>
                 </div>
 
-                {/* Right Sidebar - Flux Inscriptions */}
                 <div className="space-y-10">
-                    <div className="bg-secondary-900 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden">
+                    <div className="bg-secondary-900 rounded-[3rem] p-6 sm:p-8 lg:p-10 text-white shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600 rounded-full blur-[80px] opacity-20 -mr-16 -mt-16"></div>
                         <div className="flex justify-between items-center mb-10 relative z-10">
                             <h2 className="text-xl font-black italic">Flux Entrant</h2>
@@ -324,7 +326,7 @@ const AssistantDashboard = () => {
                                             <p className="text-[9px] font-bold text-gray-500 truncate italic">Inscrit le {new Date(ins.createdAt).toLocaleDateString()}</p>
                                         </div>
                                     </div>
-                                    <p className="text-[9px] font-black text-primary-500 uppercase tracking-widest line-clamp-1 italic italic mb-4">{ins.formationId?.titre}</p>
+                                    <p className="text-[9px] font-black text-primary-500 uppercase tracking-widest line-clamp-2 sm:line-clamp-1 italic italic mb-4">{ins.formationId?.titre}</p>
                                     <div className="flex gap-2">
                                         <button
                                             className="flex-1 bg-white text-secondary-900 py-2 rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-primary-500 hover:text-white transition-all"
@@ -357,7 +359,7 @@ const AssistantDashboard = () => {
                         </Link>
                     </div>
 
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm italic text-sm">
+                    <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm italic text-sm">
                         <div className="flex items-center gap-3 mb-4 text-primary-600">
                             <TrendingUp size={20} />
                             <span className="font-black uppercase tracking-widest text-[10px]">Analyse Logistique</span>
