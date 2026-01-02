@@ -20,7 +20,7 @@ const MainLayout = ({ theme = 'light', onToggleTheme }) => {
     if (!user) return <Navigate to="/login" />;
 
     return (
-        <div className="flex bg-gray-50/30 dark:bg-secondary-950 min-h-screen relative overflow-hidden">
+        <div className="flex bg-gray-50/30 dark:bg-secondary-950 min-h-screen relative overflow-x-hidden">
             {/* Mobile Header */}
             <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-secondary-900 border-b border-gray-100 dark:border-secondary-800 flex items-center justify-between px-6 z-40">
                 <div className="flex items-center gap-2">
