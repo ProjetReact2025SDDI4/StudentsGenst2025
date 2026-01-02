@@ -91,11 +91,18 @@ const Login = () => {
             </div>
 
             <div className="flex-1 flex flex-col justify-center items-center p-8 md:p-20 relative bg-gray-50/40 italic">
-                <Link to="/" className="absolute top-12 left-12 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-secondary-900 transition-colors">
+                <Link to="/" className="hidden md:flex absolute top-12 left-12 items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-secondary-900 transition-colors">
                     <ArrowLeft size={16} /> Retour au Site
                 </Link>
 
-                <div className="w-full max-w-md space-y-12">
+                <div className="w-full max-w-md space-y-8">
+                    <Link
+                        to="/"
+                        className="md:hidden inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-secondary-900 transition-colors"
+                    >
+                        <ArrowLeft size={16} /> Retour au Site
+                    </Link>
+
                     <div className="space-y-4">
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-[9px] font-black uppercase tracking-[0.2em] italic italic">
                             <Sparkles size={12} /> Espaces Privés
