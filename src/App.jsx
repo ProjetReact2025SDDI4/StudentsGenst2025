@@ -76,18 +76,8 @@ const App = () => {
           <Route path="/evaluation/:formationId/:formateurId" element={<EvaluationForm />} />
         </Route>
 
-        {/* Protected Routes with Sidebar Layout */}
-        <Route
-          path="/"
-          element={
-            <>
-              <div className="hidden lg:block">
-                <Navbar theme={theme} onToggleTheme={toggleTheme} />
-              </div>
-              <MainLayout theme={theme} onToggleTheme={toggleTheme} />
-            </>
-          }
-        >
+        {/* Protected Routes with Sidebar Layout (sans header public après connexion) */}
+        <Route path="/" element={<MainLayout theme={theme} onToggleTheme={toggleTheme} />}>
           {/* Dashboard Hub */}
           <Route
             path="admin/dashboard"
