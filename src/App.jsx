@@ -64,7 +64,10 @@ const App = () => {
     <div className="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-secondary-950 dark:text-gray-50">
       <Routes>
         {/* Public Routes with Navbar */}
-        <Route element={<><Navbar theme={theme} onToggleTheme={toggleTheme} /><div className="flex-grow"><Outlet /></div><footer className="bg-secondary-900 text-white py-12"><div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"><p className="text-secondary-400 font-medium">© 2025 FormationsGest - Gestion Professionnelle de Formation</p></div></footer></>}>
+        <Route element={<><Navbar theme={theme} onToggleTheme={toggleTheme} /><div className="flex-grow"><Outlet /></div><footer className="bg-secondary-900 text-white py-12"><div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-secondary-400 font-medium">© {new Date().getFullYear()} FormationsGest - Gestion Professionnelle de Formation</p>
+          </div></footer></>}>
+
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
