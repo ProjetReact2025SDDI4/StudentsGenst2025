@@ -47,7 +47,7 @@ const FormationList = () => {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (slug) => {
         const isConfirmed = await confirm({
             title: 'Supprimer la formation ?',
             message: 'Cette action est irréversible. Toutes les données associées seront perdues.',
@@ -57,7 +57,7 @@ const FormationList = () => {
 
         if (isConfirmed) {
             try {
-                await formationAPI.delete(id);
+                await formationAPI.delete(slug);
                 fetchFormations();
             } catch (err) {
                 console.error('Erreur lors de la suppression', err);
@@ -119,7 +119,7 @@ const FormationList = () => {
                             <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {canManageFormations && (
                                     <Link
-                                        to={`/admin/formations/edit/${f._id}`}
+                                        to={`/admin/formations/edit/${f.slug}`}
                                         className="p-2 bg-gray-50 text-gray-400 rounded-xl hover:text-secondary-900 transition-colors shadow-sm"
                                     >
                                         <Edit size={14} />
@@ -127,7 +127,7 @@ const FormationList = () => {
                                 )}
                                 {isAdmin && (
                                     <button
-                                        onClick={() => handleDelete(f._id)}
+                                        onClick={() => handleDelete(f.slug)}
                                         className="p-2 bg-gray-50 text-gray-400 rounded-xl hover:text-red-500 transition-colors shadow-sm"
                                     >
                                         <Trash2 size={14} />
@@ -295,7 +295,7 @@ const FormationList = () => {
                             {/* Card Footer */}
                             <div className="p-10 pt-0 flex italic font-bold">
                                 <Link
-                                    to={`/formations/${f._id}`}
+                                    to={`/formations/${f.slug}`}
                                     className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-gray-50 group-hover:bg-secondary-900 text-secondary-900 group-hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all transform active:scale-95 italic italic"
                                 >
                                     Découvrir le cursus

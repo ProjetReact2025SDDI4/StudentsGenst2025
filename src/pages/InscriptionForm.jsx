@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { formationAPI, inscriptionAPI } from '../services/api';
 
 const InscriptionForm = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
     const navigate = useNavigate();
     const [formation, setFormation] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ const InscriptionForm = () => {
     useEffect(() => {
         const fetchFormation = async () => {
             try {
-                const res = await formationAPI.getById(id);
+                const res = await formationAPI.getBySlug(slug);
                 const formationData = res.data.data;
                 setFormation(formationData);
                 
@@ -38,7 +38,7 @@ const InscriptionForm = () => {
             }
         };
         fetchFormation();
-    }, [id]);
+    }, [slug]);
 
     const [files, setFiles] = useState([]);
 
@@ -58,7 +58,10 @@ const InscriptionForm = () => {
             Object.keys(formData).forEach(key => {
                 data.append(key, formData[key]);
             });
-            data.append('formationId', id);
+            if (!formation?._id) {
+                throw new Error('Formation non chargée');
+            }
+            data.append('formationId', formation._id);
             
             files.forEach(file => {
                 data.append('documents', file);
@@ -80,7 +83,7 @@ const InscriptionForm = () => {
     return (
         <div className="bg-gradient-to-b from-white via-gray-50 to-white dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 min-h-screen flex flex-col lg:flex-row italic">
             <div className="w-full lg:w-1/3 bg-primary-600 p-8 md:p-12 lg:p-20 text-white flex flex-col justify-center lg:sticky lg:top-0 lg:h-screen overflow-hidden">
-                <Link to={`/formations/${id}`} className="absolute top-8 left-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors group">
+                <Link to={`/formations/${formation.slug}`} className="absolute top-8 left-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors group">
                     <span className="group-hover:-translate-x-1 transition-transform">←</span> Retour
                 </Link>
 

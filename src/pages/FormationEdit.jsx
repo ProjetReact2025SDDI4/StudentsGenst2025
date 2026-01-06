@@ -22,7 +22,7 @@ import { InputField, TextAreaField, Button, SelectField } from '../components/UI
  * Édition de Formation - Version Premium
  */
 const FormationEdit = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
@@ -44,7 +44,7 @@ const FormationEdit = () => {
     useEffect(() => {
         const fetchFormation = async () => {
             try {
-                const res = await formationAPI.getById(id);
+                const res = await formationAPI.getBySlug(slug);
                 const data = res.data.data;
                 setFormData({
                     titre: data.titre || '',
@@ -70,7 +70,7 @@ const FormationEdit = () => {
         };
 
         fetchFormation();
-    }, [id, navigate]);
+    }, [slug, navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -104,7 +104,7 @@ const FormationEdit = () => {
                 }
             });
 
-            await formationAPI.update(id, data);
+            await formationAPI.update(slug, data);
             alert('Formation mise à jour avec succès !');
             navigate('/admin/formations');
         } catch (err) {

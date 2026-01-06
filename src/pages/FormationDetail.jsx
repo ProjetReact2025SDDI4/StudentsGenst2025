@@ -3,14 +3,14 @@ import { useParams, Link } from 'react-router-dom';
 import { formationAPI } from '../services/api';
 
 const FormationDetail = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
     const [formation, setFormation] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchFormation = async () => {
             try {
-                const response = await formationAPI.getById(id);
+                const response = await formationAPI.getBySlug(slug);
                 setFormation(response.data.data);
             } catch (err) {
                 console.error('Erreur API', err);
@@ -19,7 +19,7 @@ const FormationDetail = () => {
             }
         };
         fetchFormation();
-    }, [id]);
+    }, [slug]);
 
     if (loading) return (
         <div className="min-h-screen flex flex-col items-center justify-center gap-4">
@@ -110,7 +110,7 @@ const FormationDetail = () => {
 
                             <div className="space-y-3">
                                 <Link 
-                                    to={`/inscription/${formation._id}`} 
+                                    to={`/inscription/${formation.slug}`} 
                                     className="btn-primary w-full py-4 text-center text-sm uppercase tracking-widest shadow-lg shadow-primary-500/20"
                                 >
                                     {formation.type === 'INDIVIDU' ? 'S\'inscrire' : 'S\'inscrire (Entreprise)'}

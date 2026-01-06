@@ -26,10 +26,10 @@ export const authAPI = {
 
 export const formationAPI = {
     getAll: (params) => api.get('/formations', { params }),
-    getById: (id) => api.get(`/formations/${id}`),
+    getBySlug: (slug) => api.get(`/formations/${slug}`),
     create: (data) => api.post('/formations', data),
-    update: (id, data) => api.put(`/formations/${id}`, data),
-    delete: (id) => api.delete(`/formations/${id}`),
+    update: (slug, data) => api.put(`/formations/${slug}`, data),
+    delete: (slug) => api.delete(`/formations/${slug}`),
     getCategories: () => api.get('/formations/categories'),
     getVilles: () => api.get('/formations/villes'),
 };

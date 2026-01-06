@@ -73,8 +73,8 @@ const App = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/formations" element={<FormationList />} />
-          <Route path="/formations/:id" element={<FormationDetail />} />
-          <Route path="/inscription/:id" element={<InscriptionForm />} />
+          <Route path="/formations/:slug" element={<FormationDetail />} />
+          <Route path="/inscription/:slug" element={<InscriptionForm />} />
           <Route path="/candidature" element={<CandidatureForm />} />
           <Route path="/evaluation/:formationId/:formateurId" element={<EvaluationForm />} />
         </Route>
@@ -141,7 +141,7 @@ const App = () => {
             }
           />
           <Route
-            path="admin/formations/edit/:id"
+            path="admin/formations/edit/:slug"
             element={
               <PrivateRoute roles={['ADMIN', 'ASSISTANT']}>
                 <FormationEdit />
